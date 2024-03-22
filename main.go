@@ -8,6 +8,8 @@ import (
 )
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	godotenv.Load()
 
 	jobPostingsBySource := make(map[string][]domain.JobPosting)
