@@ -8,16 +8,13 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	godotenv.Load()
 
 	jobPostingsBySource := make(map[string][]domain.JobPosting)
 	jobPostingsBySource = getDummyJobPostings()
 
 	csvFilename := "job_postings.csv"
-	err = writeToCSV(jobPostingsBySource, csvFilename)
+	err := writeToCSV(jobPostingsBySource, csvFilename)
 	if err != nil {
 		log.Fatal(err)
 	}
