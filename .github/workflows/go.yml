@@ -25,7 +25,7 @@ jobs:
       run: go build .
 
     - name: List
-      run: ping app.debugmail.io
+      run: cat /etc/hosts
 
     - name: Run
       run: go run .
