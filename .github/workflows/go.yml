@@ -30,4 +30,4 @@ jobs:
       run: ls
 
     - name: Run
-      run: go run ./test-go-actions
+      run: go run .
