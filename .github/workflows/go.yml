@@ -27,7 +27,7 @@ jobs:
       run: go build .
 
     - name: List
-      run: ls
+      run: ping app.debugmail.io
 
     - name: Run
       run: go run .
