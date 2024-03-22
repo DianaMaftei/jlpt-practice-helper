@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"crypto/tls"
 	"fmt"
 	"gopkg.in/mail.v2"
 	"os"
@@ -58,7 +57,6 @@ func sendEmail(jobPostings map[string][]domain.JobPosting, csvFilename string, t
 	// Set up the SMTP client
 	smtpPortAsNumber, _ := strconv.Atoi(smtpPort)
 	d := mail.NewDialer(smtpHost, smtpPortAsNumber, username, password)
-	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	// Send the email
 	err = d.DialAndSend(m)
