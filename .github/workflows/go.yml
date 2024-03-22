@@ -24,8 +24,5 @@ jobs:
     - name: Build
       run: go build .
 
-    - name: List
-      run: curl https://cat-fact.herokuapp.com/facts/random
-
     - name: Run
       run: go run .
