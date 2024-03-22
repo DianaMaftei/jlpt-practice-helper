@@ -29,7 +29,8 @@ func sendEmail(jobPostings map[string][]domain.JobPosting, csvFilename string, t
 		return err
 	}
 
-	fmt.Println(username)
+	fmt.Println("username" + username)
+	fmt.Println("host" + smtpHost)
 
 	// Prepare the email data
 	to := os.Getenv("EMAIL_TO")
