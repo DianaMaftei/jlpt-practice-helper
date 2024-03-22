@@ -4,6 +4,10 @@
 name: Go
 
 on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
   schedule:
     - cron: '*/5 * * * *'
 
@@ -20,7 +24,10 @@ jobs:
         go-version: '1.22'
 
     - name: Build
-      run: go build -v ./...
+      run: go build .
 
-    - name: Test
-      run: go test -v ./...
+    - name: List
+      run: ls
+
+    - name: Run
+      run: go run .
