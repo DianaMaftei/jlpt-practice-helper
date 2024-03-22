@@ -10,21 +10,20 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+env:
+  SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+  SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+  EMAIL_FROM: ${{ vars.EMAIL_FROM }}
+  EMAIL_TO: ${{ vars.EMAIL_TO }}
+  SMTP_HOST: ${{ vars.SMTP_HOST }}
+  SMTP_PORT: ${{ vars.SMTP_PORT }}
+
 jobs:
 
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-
-    - name: Add env vars and secrets
-      env:
-        SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
-        SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-        EMAIL_FROM: ${{ vars.EMAIL_FROM }}
-        EMAIL_TO: ${{ vars.EMAIL_TO }}
-        SMTP_HOST: ${{ vars.SMTP_HOST }}
-        SMTP_PORT: ${{ vars.SMTP_PORT }}
 
     - name: Set up Go
       uses: actions/setup-go@v4
