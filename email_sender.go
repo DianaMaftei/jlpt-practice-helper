@@ -29,6 +29,8 @@ func sendEmail(jobPostings map[string][]domain.JobPosting, csvFilename string, t
 		return err
 	}
 
+	fmt.Println(jobPostings)
+
 	// Prepare the email data
 	to := os.Getenv("EMAIL_TO")
 	from := os.Getenv("EMAIL_FROM")
