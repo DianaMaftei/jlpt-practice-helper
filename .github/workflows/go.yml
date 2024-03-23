@@ -30,6 +30,12 @@ jobs:
       with:
         go-version: '1.22'
 
+    - name: Install Playwright for Go
+      run: go get -u github.com/playwright-community/playwright-go
+
+    - name: Install Browser and OS dependencies
+      run: go run github.com/playwright-community/playwright-go/cmd/playwright@latest install --with-deps
+
     - name: Build
       run: go build .
 
