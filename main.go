@@ -1,30 +1,27 @@
 package main
 
 import (
+	"fmt"
 	"github.com/joho/godotenv"
 	"log"
 )
 
 func main() {
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-
 	godotenv.Load()
 
-	//jobPostingsBySource := make(map[string][]domain.JobPosting)
-	//jobPostingsBySource = getDummyJobPostings()
+	var AirTableApi = AirTableApi{}
 
-	Scrape()
+	AirTableApi.InitializeClient()
+	kanji := AirTableApi.GetKanji()
+	vocabulary := AirTableApi.GetVocabulary()
+	grammar := AirTableApi.GetGrammar()
+	videoUrl := AirTableApi.GetListening()
+	bookUrl := AirTableApi.GetBook()
 
-	//csvFilename := "job_postings.csv"
-	//err := writeToCSV(jobPostingsBySource, csvFilename)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//
-	//err = sendEmail(jobPostingsBySource, csvFilename, "mail_template.html")
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//
-	//fmt.Println("Email sent with job postings")
+	err := sendEmail(kanji, vocabulary, grammar, videoUrl, bookUrl, "mail_template_fun.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("mail sent")
 }

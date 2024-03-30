@@ -6,25 +6,17 @@ import (
 	"gopkg.in/mail.v2"
 	"os"
 	"strconv"
-	"strings"
-	"test-go-actions/domain"
 	"text/template"
 	"time"
 )
 
-func sendEmail(jobPostings map[string][]domain.JobPosting, csvFilename string, templateName string) error {
+func sendEmail(kanji []Kanji, vocabulary []Vocabulary, grammar []Grammar, videoUrl string, bookUrl string, templateName string) error {
 	username := os.Getenv("SMTP_USERNAME")
 	password := os.Getenv("SMTP_PASSWORD")
 	smtpHost := os.Getenv("SMTP_HOST")
 	smtpPort := os.Getenv("SMTP_PORT")
 
-	// Parse the email template
-	funcMap := template.FuncMap{
-		"containsJava": func(s string) bool {
-			return strings.Contains(s, "Java") && !strings.Contains(s, "JavaScript")
-		},
-	}
-	t, err := template.New(templateName).Funcs(funcMap).ParseFiles(templateName)
+	t, err := template.New(templateName).ParseFiles(templateName)
 	if err != nil {
 		return err
 	}
@@ -34,9 +26,17 @@ func sendEmail(jobPostings map[string][]domain.JobPosting, csvFilename string, t
 	from := os.Getenv("EMAIL_FROM")
 
 	data := struct {
-		JobPostings map[string][]domain.JobPosting
+		Kanji      []Kanji
+		Vocabulary []Vocabulary
+		Grammar    []Grammar
+		VideoUrl   string
+		BookUrl    string
 	}{
-		JobPostings: jobPostings,
+		Kanji:      kanji,
+		Vocabulary: vocabulary,
+		Grammar:    grammar,
+		VideoUrl:   videoUrl,
+		BookUrl:    bookUrl,
 	}
 
 	// Render the email template with the data
@@ -50,9 +50,8 @@ func sendEmail(jobPostings map[string][]domain.JobPosting, csvFilename string, t
 	m := mail.NewMessage()
 	m.SetHeader("From", from)
 	m.SetHeader("To", to)
-	m.SetHeader("Subject", "Daily job postings for "+getCurrentDate())
+	m.SetHeader("Subject", "Daily Japanese Lesson for "+getCurrentDate())
 	m.SetBody("text/html", emailBuffer.String())
-	m.Attach(csvFilename)
 
 	// Set up the SMTP client
 	smtpPortAsNumber, _ := strconv.Atoi(smtpPort)

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .container {
+            margin: auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fff5f5;
+        }
+
+        h1, h2, h3 {
+            color: #549cf1;
+        }
+
+        h1 {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-size: 24px;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        h3 {
+            font-size: 20px;
+        }
+
+        thead th {
+            font-weight: bold;
+            background-color: #549cf1;
+            color: white;
+        }
+
+        .kanji-container {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            background-color: #fff;
+        }
+
+        .kanji-card {
+            flex: 1 1 20%;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-radius: 5px;
+            margin: 0 auto;
+        }
+
+        .vocab-table, .grammar-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            background-color: #fff;
+        }
+
+        .vocab-table th, .grammar-table th, .vocab-table td, .grammar-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #d5e8ff;
+        }
+
+        table tr:nth-child(odd) {
+            background-color: #fff;
+        }
+
+        .vocab-table td p, .grammar-table td p {
+            font-size: 14px;
+        }
+
+        .vocab-table ruby span, .vocab-table ruby span {
+            font-size: 10px;
+        }
+
+        .text-container, .video-container {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        ruby {
+            display: inline-block;
+            position: relative;
+        }
+
+        rt {
+            display: block;
+            position: absolute;
+            font-size: 100%;
+            line-height: 1;
+            top: 100%;
+            left: 0;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container"><h1>🎌 Daily Japanese Lesson - JLPT N5 Prep 日本語の勉強 🎎</h1>
+    <h2>🈯 Kanji Time! 🈯</h2>
+    <div class="kanji-container">
+        {{range $index, $kanjiInfo := .Kanji}}
+            <div class="kanji-card">
+                <div>
+                    <img src="{{$kanjiInfo.GifUrl}}">
+                </div>
+                <p><strong>Meaning:</strong> {{ $kanjiInfo.Meaning }}</p>
+                <p><strong>On Reading:</strong> {{ $kanjiInfo.OnReading }}</p>
+                <p><strong>Kun Reading:</strong> {{ $kanjiInfo.KunReading }}</p>
+                {{/*                <p><strong>Example Words:</strong> {{ $kanjiInfo.Salary }}</p>*/}}
+            </div>
+        {{end}}
+    </div>
+
+    <h2>📝 Vocab Fun! 📝</h2>
+    <table class="vocab-table">
+        <thead>
+        <tr>
+            <th>Kanji</th>
+            <th>Kana</th>
+            <th>Meaning</th>
+            <th>Example Sentence (Japanese)</th>
+            <th>Example Sentence (English)</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{range $index, $vocabularyInfo := .Vocabulary}}
+            <tr>
+                <td>{{$vocabularyInfo.Kanji}}</td>
+                <td>{{$vocabularyInfo.Kana}}</td>
+                <td>{{$vocabularyInfo.Meaning}}</td>
+                <td>{{$vocabularyInfo.ExampleJp}}</td>
+                <td>{{$vocabularyInfo.ExampleEn}}</td>
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
+
+    <h2>📚 Grammar Adventure! 📚</h2>
+    <table class="grammar-table">
+        <thead>
+        <tr>
+            <th>Grammar Structure</th>
+            <th>Explanation</th>
+            <th>Example Sentence 1 (Japanese)</th>
+            <th>Example Sentence 1 (English)</th>
+            <th>Example Sentence 2 (Japanese)</th>
+            <th>Example Sentence 2 (English)</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{range $index, $grammarInfo := .Grammar}}
+            <tr>
+                <td>{{$grammarInfo.Grammar}}</td>
+                <td>{{$grammarInfo.Explanation}}</td>
+                <td>{{$grammarInfo.Example1Jp}}</td>
+                <td>{{$grammarInfo.Example1En}}</td>
+                <td>{{$grammarInfo.Example2Jp}}</td>
+                <td>{{$grammarInfo.Example2En}}</td>
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
+
+    <h2>📖 Daily Story ! 📖</h2>
+    <div class="text-container">
+        <p>
+            <a href="{{.BookUrl}}">Click here to read a cute book for N5 reading practice.</a>
+        </p>
+    </div>
+
+    <h2>👂 Listen Carefully ! 👂</h2>
+    <div class="video-container">
+        <a href="{{.VideoUrl}}">Click here to listen to a youtube video for N5 listening practice.</a>
+    </div>
+</div>
+</body>
+</html>
