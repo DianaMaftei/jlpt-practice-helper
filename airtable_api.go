@@ -26,14 +26,14 @@ func (a *AirTableApi) GetKanji() []Kanji {
 	sortQuery := struct {
 		FieldName string
 		Direction string
-	}{"meaning", "desc"}
+	}{"record_id", "desc"}
 
 	records, err := table.GetRecords().
 		FromView("Grid view").
 		WithFilterFormula("AND({seen}=0)").
 		WithSort(sortQuery).
 		ReturnFields("kanji", "meaning", "kun_reading", "on_reading").
-		MaxRecords(3).
+		MaxRecords(5).
 		Do()
 	if err != nil {
 		// Handle error
@@ -48,11 +48,21 @@ func (a *AirTableApi) GetKanji() []Kanji {
 		baseURL := "https://raw.githubusercontent.com/jcsirot/kanji.gif/master/kanji/gif/150x150/"
 		gifURL := baseURL + escapedKanji + ".gif"
 
+		kunReading, ok := record.Fields["kun_reading"].(string)
+		if !ok {
+			kunReading = ""
+		}
+
+		onReading, ok := record.Fields["on_reading"].(string)
+		if !ok {
+			onReading = ""
+		}
+
 		kanji = append(kanji, Kanji{
 			Kanji:      character,
 			Meaning:    record.Fields["meaning"].(string),
-			KunReading: commaSeparatedList(record.Fields["kun_reading"].(string)),
-			OnReading:  commaSeparatedList(record.Fields["on_reading"].(string)),
+			KunReading: commaSeparatedList(kunReading),
+			OnReading:  commaSeparatedList(onReading),
 			GifUrl:     gifURL,
 		})
 
@@ -67,14 +77,14 @@ func (a *AirTableApi) GetVocabulary() []Vocabulary {
 	sortQuery := struct {
 		FieldName string
 		Direction string
-	}{"english", "desc"}
+	}{"record_id", "desc"}
 
 	records, err := table.GetRecords().
 		FromView("Grid view").
 		WithFilterFormula("AND({seen}=0)").
 		WithSort(sortQuery).
 		ReturnFields("kanji", "kana", "english", "ex1_ja_furigana", "ex1_en").
-		MaxRecords(5).
+		MaxRecords(30).
 		Do()
 	if err != nil {
 		// Handle error
@@ -85,16 +95,89 @@ func (a *AirTableApi) GetVocabulary() []Vocabulary {
 
 	for _, record := range records.Records {
 
+		exampleJp, ok := record.Fields["ex1_ja_furigana"].(string)
+		if !ok {
+			exampleJp = ""
+		}
+
+		exampleEn, ok := record.Fields["ex1_en"].(string)
+		if !ok {
+			exampleEn = ""
+		}
+
 		vocabulary = append(vocabulary, Vocabulary{
 			Kanji:     record.Fields["kanji"].(string),
 			Kana:      record.Fields["kana"].(string),
 			Meaning:   record.Fields["english"].(string),
-			ExampleJp: generateHtmlWithFurigana(record.Fields["ex1_ja_furigana"].(string)),
-			ExampleEn: record.Fields["ex1_en"].(string),
+			ExampleJp: generateHtmlWithFurigana(exampleJp),
+			ExampleEn: exampleEn,
 		})
 	}
 
 	return vocabulary
+}
+
+func (a *AirTableApi) GetGrammar() []Grammar {
+	table := a.Client.GetTable("appLROzl1t7bORKvn", "Grammar")
+
+	sortQuery := struct {
+		FieldName string
+		Direction string
+	}{"record_id", "desc"}
+
+	records, err := table.GetRecords().
+		FromView("Grid view").
+		WithFilterFormula("AND({seen}=0)").
+		WithSort(sortQuery).
+		ReturnFields("grammar", "meaning", "ex1_ja_furigana", "ex1_en", "ex2_ja_furigana", "ex2_en", "bunpro").
+		MaxRecords(2).
+		Do()
+	if err != nil {
+		// Handle error
+		fmt.Println(err)
+	}
+
+	var grammar []Grammar
+
+	for _, record := range records.Records {
+
+		exampleJp1, ok := record.Fields["ex1_ja_furigana"].(string)
+		if !ok {
+			exampleJp1 = ""
+		}
+
+		exampleEn1, ok := record.Fields["ex1_en"].(string)
+		if !ok {
+			exampleEn1 = ""
+		}
+
+		exampleJp2, ok := record.Fields["ex2_ja_furigana"].(string)
+		if !ok {
+			exampleJp2 = ""
+		}
+
+		exampleEn2, ok := record.Fields["ex2_en"].(string)
+		if !ok {
+			exampleEn2 = ""
+		}
+
+		bunpro, ok := record.Fields["bunpro"].(string)
+		if !ok {
+			bunpro = ""
+		}
+
+		grammar = append(grammar, Grammar{
+			Grammar:     record.Fields["grammar"].(string),
+			Explanation: record.Fields["meaning"].(string),
+			Example1Jp:  generateHtmlWithFurigana(exampleJp1),
+			Example1En:  exampleEn1,
+			Example2Jp:  generateHtmlWithFurigana(exampleJp2),
+			Example2En:  exampleEn2,
+			Bunpro:      bunpro,
+		})
+	}
+
+	return grammar
 }
 
 func (a *AirTableApi) GetListening() string {
@@ -116,13 +199,13 @@ func (a *AirTableApi) GetListening() string {
 	return record.Fields["url"].(string)
 }
 
-func (a *AirTableApi) GetBook() string {
+func (a *AirTableApi) GetBook() Book {
 	table := a.Client.GetTable("appLROzl1t7bORKvn", "Books")
 
 	records, err := table.GetRecords().
 		FromView("Grid view").
 		WithFilterFormula("AND({seen}=0)").
-		ReturnFields("url").
+		ReturnFields("url", "img").
 		MaxRecords(1).
 		Do()
 	if err != nil {
@@ -132,44 +215,10 @@ func (a *AirTableApi) GetBook() string {
 
 	var record = records.Records[0]
 
-	return record.Fields["url"].(string)
-}
-
-func (a *AirTableApi) GetGrammar() []Grammar {
-	table := a.Client.GetTable("appLROzl1t7bORKvn", "Grammar")
-
-	sortQuery := struct {
-		FieldName string
-		Direction string
-	}{"meaning", "desc"}
-
-	records, err := table.GetRecords().
-		FromView("Grid view").
-		WithFilterFormula("AND({seen}=0)").
-		WithSort(sortQuery).
-		ReturnFields("grammar", "meaning", "ex1_ja_furigana", "ex1_en", "ex2_ja_furigana", "ex2_en").
-		MaxRecords(2).
-		Do()
-	if err != nil {
-		// Handle error
-		fmt.Println(err)
+	return Book{
+		Url: record.Fields["url"].(string),
+		Img: record.Fields["img"].(string),
 	}
-
-	var grammar []Grammar
-
-	for _, record := range records.Records {
-
-		grammar = append(grammar, Grammar{
-			Grammar:     record.Fields["grammar"].(string),
-			Explanation: record.Fields["meaning"].(string),
-			Example1Jp:  generateHtmlWithFurigana(record.Fields["ex1_ja_furigana"].(string)),
-			Example1En:  record.Fields["ex1_en"].(string),
-			Example2Jp:  generateHtmlWithFurigana(record.Fields["ex2_ja_furigana"].(string)),
-			Example2En:  record.Fields["ex2_en"].(string),
-		})
-	}
-
-	return grammar
 }
 
 func removeHTMLTags(s string) string {
@@ -188,14 +237,12 @@ func updateRecords(table airtable.Table) {
 		Records: []*airtable.Record{
 			{
 				Fields: map[string]any{
-					"Field1": "value1",
-					"Field2": true,
+					"seen": true,
 				},
 			},
 			{
 				Fields: map[string]any{
 					"Field1": "value1",
-					"Field2": true,
 				},
 			},
 		},

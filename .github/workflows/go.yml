@@ -4,10 +4,8 @@
 name: Go-Job-Parser 
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  schedule:
+    - cron: '3 10 * * *'
   workflow_dispatch:
 
 env:
@@ -17,6 +15,7 @@ env:
   EMAIL_TO: ${{ vars.EMAIL_TO }}
   SMTP_HOST: ${{ vars.SMTP_HOST }}
   SMTP_PORT: ${{ vars.SMTP_PORT }}
+  AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
 
 jobs:
 
@@ -29,12 +28,6 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.22'
-
-    - name: Install Playwright for Go
-      run: go get -u github.com/playwright-community/playwright-go
-
-    - name: Install Browser and OS dependencies
-      run: go run github.com/playwright-community/playwright-go/cmd/playwright@latest install --with-deps
 
     - name: Build
       run: go build .

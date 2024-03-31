@@ -6,7 +6,7 @@ import (
 
 func generateHtmlWithFurigana(sentence string) string {
 	var html strings.Builder
-	html.WriteString("<p>")
+	html.WriteString("<span>")
 
 	sentenceParts := strings.Fields(sentence)
 
@@ -24,7 +24,7 @@ func generateHtmlWithFurigana(sentence string) string {
 		html.WriteString(sentencePart[indexOfCloseParen+1:])
 	}
 
-	html.WriteString("</p>")
+	html.WriteString("</span>")
 	return html.String()
 }
 

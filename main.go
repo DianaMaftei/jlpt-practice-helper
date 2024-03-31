@@ -16,9 +16,9 @@ func main() {
 	vocabulary := AirTableApi.GetVocabulary()
 	grammar := AirTableApi.GetGrammar()
 	videoUrl := AirTableApi.GetListening()
-	bookUrl := AirTableApi.GetBook()
+	book := AirTableApi.GetBook()
 
-	err := sendEmail(kanji, vocabulary, grammar, videoUrl, bookUrl, "mail_template_fun.html")
+	err := sendEmail(kanji, vocabulary, grammar, videoUrl, book, "mail_template_fun.html")
 	if err != nil {
 		log.Fatal(err)
 	}

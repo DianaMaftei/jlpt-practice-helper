@@ -23,4 +23,10 @@ type Grammar struct {
 	Example1En  string
 	Example2Jp  string
 	Example2En  string
+	Bunpro      string
+}
+
+type Book struct {
+	Url string
+	Img string
 }

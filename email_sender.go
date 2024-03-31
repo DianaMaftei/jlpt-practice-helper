@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func sendEmail(kanji []Kanji, vocabulary []Vocabulary, grammar []Grammar, videoUrl string, bookUrl string, templateName string) error {
+func sendEmail(kanji []Kanji, vocabulary []Vocabulary, grammar []Grammar, videoUrl string, book Book, templateName string) error {
 	username := os.Getenv("SMTP_USERNAME")
 	password := os.Getenv("SMTP_PASSWORD")
 	smtpHost := os.Getenv("SMTP_HOST")
@@ -30,13 +30,13 @@ func sendEmail(kanji []Kanji, vocabulary []Vocabulary, grammar []Grammar, videoU
 		Vocabulary []Vocabulary
 		Grammar    []Grammar
 		VideoUrl   string
-		BookUrl    string
+		Book       Book
 	}{
 		Kanji:      kanji,
 		Vocabulary: vocabulary,
 		Grammar:    grammar,
 		VideoUrl:   videoUrl,
-		BookUrl:    bookUrl,
+		Book:       book,
 	}
 
 	// Render the email template with the data

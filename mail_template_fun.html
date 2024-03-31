@@ -56,7 +56,7 @@
             margin: 0 auto;
         }
 
-        .vocab-table, .grammar-table {
+        .vocab-table {
             width: 100%;
             border-collapse: collapse;
             border-radius: 5px;
@@ -65,7 +65,7 @@
             background-color: #fff;
         }
 
-        .vocab-table th, .grammar-table th, .vocab-table td, .grammar-table td {
+        .vocab-table th, .vocab-table td {
             border: 1px solid #ddd;
             padding: 10px;
             text-align: left;
@@ -85,6 +85,48 @@
 
         .vocab-table ruby span, .vocab-table ruby span {
             font-size: 10px;
+        }
+
+        .grammar-container {
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .lesson {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .grammar {
+            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .grammar a {
+            color: #549cf1;
+        }
+
+        .explanation {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .example {
+            color: #444;
+            font-size: 16px;
+            margin-left: 15px;
+        }
+
+        .example em {
+            font-style: italic;
         }
 
         .text-container, .video-container {
@@ -126,7 +168,6 @@
                 <p><strong>Meaning:</strong> {{ $kanjiInfo.Meaning }}</p>
                 <p><strong>On Reading:</strong> {{ $kanjiInfo.OnReading }}</p>
                 <p><strong>Kun Reading:</strong> {{ $kanjiInfo.KunReading }}</p>
-                {{/*                <p><strong>Example Words:</strong> {{ $kanjiInfo.Salary }}</p>*/}}
             </div>
         {{end}}
     </div>
@@ -145,7 +186,7 @@
         <tbody>
         {{range $index, $vocabularyInfo := .Vocabulary}}
             <tr>
-                <td>{{$vocabularyInfo.Kanji}}</td>
+                <td><a href="https://jisho.org/search/{{$vocabularyInfo.Kanji}}"></a>{{$vocabularyInfo.Kanji}}</td>
                 <td>{{$vocabularyInfo.Kana}}</td>
                 <td>{{$vocabularyInfo.Meaning}}</td>
                 <td>{{$vocabularyInfo.ExampleJp}}</td>
@@ -156,35 +197,28 @@
     </table>
 
     <h2>📚 Grammar Adventure! 📚</h2>
-    <table class="grammar-table">
-        <thead>
-        <tr>
-            <th>Grammar Structure</th>
-            <th>Explanation</th>
-            <th>Example Sentence 1 (Japanese)</th>
-            <th>Example Sentence 1 (English)</th>
-            <th>Example Sentence 2 (Japanese)</th>
-            <th>Example Sentence 2 (English)</th>
-        </tr>
-        </thead>
-        <tbody>
+    <div class="grammar-container">
         {{range $index, $grammarInfo := .Grammar}}
-            <tr>
-                <td>{{$grammarInfo.Grammar}}</td>
-                <td>{{$grammarInfo.Explanation}}</td>
-                <td>{{$grammarInfo.Example1Jp}}</td>
-                <td>{{$grammarInfo.Example1En}}</td>
-                <td>{{$grammarInfo.Example2Jp}}</td>
-                <td>{{$grammarInfo.Example2En}}</td>
-            </tr>
+            <div class="lesson">
+                <div class="grammar">Grammar Structure: <span><a href="{{$grammarInfo.Bunpro}}">{{$grammarInfo.Grammar}}</a></span></div>
+                <div class="explanation">Explanation: <span>{{$grammarInfo.Explanation}}</span></div>
+                <div class="example">
+                    <div><strong>Example 1 (Japanese): </strong><em>{{$grammarInfo.Example1Jp}}</em></div>
+                    <div><strong>Example 1 (English): </strong><em>{{$grammarInfo.Example1En}}</em></div>
+                    <div><strong>Example 2 (Japanese): </strong><em>{{$grammarInfo.Example2Jp}}</em></div>
+                    <div><strong>Example 2 (English): </strong><em>{{$grammarInfo.Example2En}}</em></div>
+                </div>
+            </div>
         {{end}}
-        </tbody>
-    </table>
+    </div>
 
     <h2>📖 Daily Story ! 📖</h2>
     <div class="text-container">
         <p>
-            <a href="{{.BookUrl}}">Click here to read a cute book for N5 reading practice.</a>
+            <a href="{{.Book.Url}}">
+                <img src="{{.Book.Img}}">
+            </a>
+
         </p>
     </div>
 
