@@ -13,6 +13,7 @@ env:
   SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
   EMAIL_FROM: ${{ vars.EMAIL_FROM }}
   EMAIL_TO: ${{ vars.EMAIL_TO }}
+  EMAIL_CC: ${{ vars.EMAIL_CC }}
   SMTP_HOST: ${{ vars.SMTP_HOST }}
   SMTP_PORT: ${{ vars.SMTP_PORT }}
   AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
