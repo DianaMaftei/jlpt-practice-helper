@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/mehanizm/airtable"
+	"log"
 	"net/url"
 	"os"
 	"regexp"
@@ -68,6 +69,8 @@ func (a *AirTableApi) GetKanji() []Kanji {
 
 	}
 
+	updateRecords(table, records)
+
 	return kanji
 }
 
@@ -113,6 +116,8 @@ func (a *AirTableApi) GetVocabulary() []Vocabulary {
 			ExampleEn: exampleEn,
 		})
 	}
+
+	updateRecords(table, records)
 
 	return vocabulary
 }
@@ -177,6 +182,8 @@ func (a *AirTableApi) GetGrammar() []Grammar {
 		})
 	}
 
+	updateRecords(table, records)
+
 	return grammar
 }
 
@@ -195,6 +202,10 @@ func (a *AirTableApi) GetListening() string {
 	}
 
 	var record = records.Records[0]
+	_, err = record.UpdateRecordPartial(map[string]any{"seen": true})
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return record.Fields["url"].(string)
 }
@@ -214,6 +225,10 @@ func (a *AirTableApi) GetBook() Book {
 	}
 
 	var record = records.Records[0]
+	_, err = record.UpdateRecordPartial(map[string]any{"seen": true})
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return Book{
 		Url: record.Fields["url"].(string),
@@ -232,23 +247,24 @@ func commaSeparatedList(s string) string {
 	return strings.Join(items, ", ")
 }
 
-func updateRecords(table airtable.Table) {
-	toUpdateRecords := &airtable.Records{
-		Records: []*airtable.Record{
-			{
-				Fields: map[string]any{
-					"seen": true,
-				},
+func updateRecords(table *airtable.Table, records *airtable.Records) {
+
+	r := &airtable.Records{}
+	r.Records = []*airtable.Record{}
+
+	for _, record := range records.Records {
+		newRecord := airtable.Record{
+			ID: record.ID,
+			Fields: map[string]interface{}{
+				"seen": true,
 			},
-			{
-				Fields: map[string]any{
-					"Field1": "value1",
-				},
-			},
-		},
+		}
+
+		r.Records = append(r.Records, &newRecord)
 	}
-	_, err := table.UpdateRecords(toUpdateRecords)
+
+	_, err := table.UpdateRecordsPartial(r)
 	if err != nil {
-		// Handle error
+		log.Fatal(err)
 	}
 }

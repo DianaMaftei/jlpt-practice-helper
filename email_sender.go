@@ -24,6 +24,7 @@ func sendEmail(kanji []Kanji, vocabulary []Vocabulary, grammar []Grammar, videoU
 	// Prepare the email data
 	to := os.Getenv("EMAIL_TO")
 	from := os.Getenv("EMAIL_FROM")
+	cc := os.Getenv("EMAIL_CC")
 
 	data := struct {
 		Kanji      []Kanji
@@ -50,6 +51,7 @@ func sendEmail(kanji []Kanji, vocabulary []Vocabulary, grammar []Grammar, videoU
 	m := mail.NewMessage()
 	m.SetHeader("From", from)
 	m.SetHeader("To", to)
+	m.SetHeader("Cc", cc)
 	m.SetHeader("Subject", "Daily Japanese Lesson for "+getCurrentDate())
 	m.SetBody("text/html", emailBuffer.String())
 
