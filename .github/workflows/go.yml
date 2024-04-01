@@ -5,7 +5,7 @@ name: Go-Job-Parser
 
 on:
   schedule:
-    - cron: '3 10 * * *'
+    - cron: '10 3 * * *'
   workflow_dispatch:
 
 env:
