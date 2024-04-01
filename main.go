@@ -4,9 +4,13 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	"log"
+	"time"
 )
 
 func main() {
+	startTime := time.Now()
+	fmt.Printf("Application started at: %s\n", startTime.Format("2006-01-02 15:04:05"))
+
 	godotenv.Load()
 
 	var AirTableApi = AirTableApi{}
@@ -23,5 +27,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("mail sent")
+	fmt.Println("Email has been successfully sent!")
+	endTime := time.Now()
+	fmt.Printf("Application ended at: %s\n", endTime.Format("2006-01-02 15:04:05"))
+
+	duration := endTime.Sub(startTime)
+	fmt.Printf("The application took %v to run.\n", duration)
 }

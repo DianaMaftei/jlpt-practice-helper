@@ -15,16 +15,14 @@ func sendEmail(kanji []Kanji, vocabulary []Vocabulary, grammar []Grammar, videoU
 	password := os.Getenv("SMTP_PASSWORD")
 	smtpHost := os.Getenv("SMTP_HOST")
 	smtpPort := os.Getenv("SMTP_PORT")
+	to := os.Getenv("EMAIL_TO")
+	from := os.Getenv("EMAIL_FROM")
+	cc := os.Getenv("EMAIL_CC")
 
 	t, err := template.New(templateName).ParseFiles(templateName)
 	if err != nil {
 		return err
 	}
-
-	// Prepare the email data
-	to := os.Getenv("EMAIL_TO")
-	from := os.Getenv("EMAIL_FROM")
-	cc := os.Getenv("EMAIL_CC")
 
 	data := struct {
 		Kanji      []Kanji

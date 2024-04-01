@@ -22,26 +22,14 @@ func (a *AirTableApi) InitializeClient() {
 }
 
 func (a *AirTableApi) GetKanji() []Kanji {
-	table := a.Client.GetTable("appLROzl1t7bORKvn", "Kanji")
-
-	sortQuery := struct {
-		FieldName string
-		Direction string
-	}{"record_id", "desc"}
-
-	records, err := table.GetRecords().
-		FromView("Grid view").
-		WithFilterFormula("AND({seen}=0)").
-		WithSort(sortQuery).
-		ReturnFields("kanji", "meaning", "kun_reading", "on_reading").
-		MaxRecords(5).
-		Do()
-	if err != nil {
-		// Handle error
-		fmt.Println(err)
-	}
-
 	var kanji []Kanji
+
+	table := a.Client.GetTable("appLROzl1t7bORKvn", "Kanji")
+	records, err := getSortedUnseenRecords(table, "record_id", 5, "kanji", "meaning", "kun_reading", "on_reading")
+	if err != nil {
+		fmt.Println(err)
+		return kanji
+	}
 
 	for _, record := range records.Records {
 		character := record.Fields["kanji"].(string)
@@ -49,15 +37,8 @@ func (a *AirTableApi) GetKanji() []Kanji {
 		baseURL := "https://raw.githubusercontent.com/jcsirot/kanji.gif/master/kanji/gif/150x150/"
 		gifURL := baseURL + escapedKanji + ".gif"
 
-		kunReading, ok := record.Fields["kun_reading"].(string)
-		if !ok {
-			kunReading = ""
-		}
-
-		onReading, ok := record.Fields["on_reading"].(string)
-		if !ok {
-			onReading = ""
-		}
+		kunReading := getStringFieldOrDefaultEmpty(record, "kun_reading")
+		onReading := getStringFieldOrDefaultEmpty(record, "on_reading")
 
 		kanji = append(kanji, Kanji{
 			Kanji:      character,
@@ -66,48 +47,25 @@ func (a *AirTableApi) GetKanji() []Kanji {
 			OnReading:  commaSeparatedList(onReading),
 			GifUrl:     gifURL,
 		})
-
 	}
 
-	updateRecords(table, records)
-
+	markRecordsAsSeen(table, records)
 	return kanji
 }
 
 func (a *AirTableApi) GetVocabulary() []Vocabulary {
-	table := a.Client.GetTable("appLROzl1t7bORKvn", "Vocabulary")
-
-	sortQuery := struct {
-		FieldName string
-		Direction string
-	}{"record_id", "desc"}
-
-	records, err := table.GetRecords().
-		FromView("Grid view").
-		WithFilterFormula("AND({seen}=0)").
-		WithSort(sortQuery).
-		ReturnFields("kanji", "kana", "english", "ex1_ja_furigana", "ex1_en").
-		MaxRecords(30).
-		Do()
-	if err != nil {
-		// Handle error
-		fmt.Println(err)
-	}
-
 	var vocabulary []Vocabulary
 
+	table := a.Client.GetTable("appLROzl1t7bORKvn", "Vocabulary")
+	records, err := getSortedUnseenRecords(table, "record_id", 30, "kanji", "kana", "english", "ex1_ja_furigana", "ex1_en")
+	if err != nil {
+		fmt.Println(err)
+		return vocabulary
+	}
+
 	for _, record := range records.Records {
-
-		exampleJp, ok := record.Fields["ex1_ja_furigana"].(string)
-		if !ok {
-			exampleJp = ""
-		}
-
-		exampleEn, ok := record.Fields["ex1_en"].(string)
-		if !ok {
-			exampleEn = ""
-		}
-
+		exampleJp := getStringFieldOrDefaultEmpty(record, "ex1_ja_furigana")
+		exampleEn := getStringFieldOrDefaultEmpty(record, "ex1_en")
 		vocabulary = append(vocabulary, Vocabulary{
 			Kanji:     record.Fields["kanji"].(string),
 			Kana:      record.Fields["kana"].(string),
@@ -117,59 +75,26 @@ func (a *AirTableApi) GetVocabulary() []Vocabulary {
 		})
 	}
 
-	updateRecords(table, records)
-
+	markRecordsAsSeen(table, records)
 	return vocabulary
 }
 
 func (a *AirTableApi) GetGrammar() []Grammar {
-	table := a.Client.GetTable("appLROzl1t7bORKvn", "Grammar")
-
-	sortQuery := struct {
-		FieldName string
-		Direction string
-	}{"record_id", "desc"}
-
-	records, err := table.GetRecords().
-		FromView("Grid view").
-		WithFilterFormula("AND({seen}=0)").
-		WithSort(sortQuery).
-		ReturnFields("grammar", "meaning", "ex1_ja_furigana", "ex1_en", "ex2_ja_furigana", "ex2_en", "bunpro").
-		MaxRecords(2).
-		Do()
-	if err != nil {
-		// Handle error
-		fmt.Println(err)
-	}
-
 	var grammar []Grammar
 
+	table := a.Client.GetTable("appLROzl1t7bORKvn", "Grammar")
+	records, err := getSortedUnseenRecords(table, "record_id", 2, "grammar", "meaning", "ex1_ja_furigana", "ex1_en", "ex2_ja_furigana", "ex2_en", "bunpro")
+	if err != nil {
+		fmt.Println(err)
+		return grammar
+	}
+
 	for _, record := range records.Records {
-
-		exampleJp1, ok := record.Fields["ex1_ja_furigana"].(string)
-		if !ok {
-			exampleJp1 = ""
-		}
-
-		exampleEn1, ok := record.Fields["ex1_en"].(string)
-		if !ok {
-			exampleEn1 = ""
-		}
-
-		exampleJp2, ok := record.Fields["ex2_ja_furigana"].(string)
-		if !ok {
-			exampleJp2 = ""
-		}
-
-		exampleEn2, ok := record.Fields["ex2_en"].(string)
-		if !ok {
-			exampleEn2 = ""
-		}
-
-		bunpro, ok := record.Fields["bunpro"].(string)
-		if !ok {
-			bunpro = ""
-		}
+		exampleJp1 := getStringFieldOrDefaultEmpty(record, "ex1_ja_furigana")
+		exampleEn1 := getStringFieldOrDefaultEmpty(record, "ex1_en")
+		exampleJp2 := getStringFieldOrDefaultEmpty(record, "ex2_ja_furigana")
+		exampleEn2 := getStringFieldOrDefaultEmpty(record, "ex2_en")
+		bunpro := getStringFieldOrDefaultEmpty(record, "bunpro")
 
 		grammar = append(grammar, Grammar{
 			Grammar:     record.Fields["grammar"].(string),
@@ -182,23 +107,16 @@ func (a *AirTableApi) GetGrammar() []Grammar {
 		})
 	}
 
-	updateRecords(table, records)
-
+	markRecordsAsSeen(table, records)
 	return grammar
 }
 
 func (a *AirTableApi) GetListening() string {
 	table := a.Client.GetTable("appLROzl1t7bORKvn", "Listening")
-
-	records, err := table.GetRecords().
-		FromView("Grid view").
-		WithFilterFormula("AND({seen}=0)").
-		ReturnFields("url").
-		MaxRecords(1).
-		Do()
+	records, err := getSortedUnseenRecords(table, "title", 1, "url")
 	if err != nil {
-		// Handle error
 		fmt.Println(err)
+		return ""
 	}
 
 	var record = records.Records[0]
@@ -213,41 +131,38 @@ func (a *AirTableApi) GetListening() string {
 func (a *AirTableApi) GetBook() Book {
 	table := a.Client.GetTable("appLROzl1t7bORKvn", "Books")
 
+	records, err := getSortedUnseenRecords(table, "title", 1, "url", "img")
+	if err != nil {
+		fmt.Println(err)
+		return Book{}
+	}
+
+	markRecordsAsSeen(table, records)
+
+	return Book{
+		Url: records.Records[0].Fields["url"].(string),
+		Img: records.Records[0].Fields["img"].(string),
+	}
+}
+
+func getSortedUnseenRecords(table *airtable.Table, sortField string, maxRecords int, fields ...string) (*airtable.Records, error) {
+	sortQuery := struct {
+		FieldName string
+		Direction string
+	}{sortField, "desc"}
+
 	records, err := table.GetRecords().
 		FromView("Grid view").
 		WithFilterFormula("AND({seen}=0)").
-		ReturnFields("url", "img").
-		MaxRecords(1).
+		WithSort(sortQuery).
+		ReturnFields(fields...).
+		MaxRecords(maxRecords).
 		Do()
-	if err != nil {
-		// Handle error
-		fmt.Println(err)
-	}
 
-	var record = records.Records[0]
-	_, err = record.UpdateRecordPartial(map[string]any{"seen": true})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return Book{
-		Url: record.Fields["url"].(string),
-		Img: record.Fields["img"].(string),
-	}
+	return records, err
 }
 
-func removeHTMLTags(s string) string {
-	re := regexp.MustCompile(`<[^>]+>`)
-	return re.ReplaceAllString(s, " ")
-}
-
-func commaSeparatedList(s string) string {
-	text := removeHTMLTags(s)
-	items := strings.Fields(text)
-	return strings.Join(items, ", ")
-}
-
-func updateRecords(table *airtable.Table, records *airtable.Records) {
+func markRecordsAsSeen(table *airtable.Table, records *airtable.Records) {
 	const maxRecordsPerRequest = 10
 
 	for i := 0; i < len(records.Records); i += maxRecordsPerRequest {
@@ -275,4 +190,24 @@ func updateRecords(table *airtable.Table, records *airtable.Records) {
 			log.Fatal(err)
 		}
 	}
+}
+
+func removeHTMLTags(s string) string {
+	re := regexp.MustCompile(`<[^>]+>`)
+	return re.ReplaceAllString(s, " ")
+}
+
+func commaSeparatedList(s string) string {
+	text := removeHTMLTags(s)
+	items := strings.Fields(text)
+	return strings.Join(items, ", ")
+}
+
+func getStringFieldOrDefaultEmpty(record *airtable.Record, fieldName string) string {
+	field, ok := record.Fields[fieldName].(string)
+	if !ok {
+		field = ""
+	}
+
+	return field
 }
