@@ -186,7 +186,7 @@
         <tbody>
         {{range $index, $vocabularyInfo := .Vocabulary}}
             <tr>
-                <td><a href="https://jisho.org/search/{{$vocabularyInfo.Kanji}}"></a>{{$vocabularyInfo.Kanji}}</td>
+                <td><a href="https://jisho.org/search/{{$vocabularyInfo.Kanji}}">{{$vocabularyInfo.Kanji}}</a></td>
                 <td>{{$vocabularyInfo.Kana}}</td>
                 <td>{{$vocabularyInfo.Meaning}}</td>
                 <td>{{$vocabularyInfo.ExampleJp}}</td>

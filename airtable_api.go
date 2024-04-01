@@ -248,23 +248,31 @@ func commaSeparatedList(s string) string {
 }
 
 func updateRecords(table *airtable.Table, records *airtable.Records) {
+	const maxRecordsPerRequest = 10
 
-	r := &airtable.Records{}
-	r.Records = []*airtable.Record{}
-
-	for _, record := range records.Records {
-		newRecord := airtable.Record{
-			ID: record.ID,
-			Fields: map[string]interface{}{
-				"seen": true,
-			},
+	for i := 0; i < len(records.Records); i += maxRecordsPerRequest {
+		end := i + maxRecordsPerRequest
+		if end > len(records.Records) {
+			end = len(records.Records)
 		}
 
-		r.Records = append(r.Records, &newRecord)
-	}
+		r := &airtable.Records{}
+		r.Records = []*airtable.Record{}
 
-	_, err := table.UpdateRecordsPartial(r)
-	if err != nil {
-		log.Fatal(err)
+		for _, record := range records.Records[i:end] {
+			newRecord := airtable.Record{
+				ID: record.ID,
+				Fields: map[string]interface{}{
+					"seen": true,
+				},
+			}
+
+			r.Records = append(r.Records, &newRecord)
+		}
+
+		_, err := table.UpdateRecordsPartial(r)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
