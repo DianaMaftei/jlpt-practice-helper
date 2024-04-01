@@ -22,3 +22,7 @@ Environment variables that it needs:
 - SMTP_HOST
 - SMTP_PORT
 - AIRTABLE_API_KEY
+
+The resulting email looks like this:
+
+![email-visual](/static/jlpt_email.gif)
