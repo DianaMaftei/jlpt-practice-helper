@@ -57,7 +57,7 @@ func (a *AirTableApi) GetVocabulary() []Vocabulary {
 	var vocabulary []Vocabulary
 
 	table := a.Client.GetTable("appLROzl1t7bORKvn", "Vocabulary")
-	records, err := getSortedUnseenRecords(table, "record_id", 30, "kanji", "kana", "english", "ex1_ja_furigana", "ex1_en")
+	records, err := getSortedUnseenRecords(table, "record_id", 40, "kanji", "kana", "english", "ex1_ja_furigana", "ex1_en")
 	if err != nil {
 		fmt.Println(err)
 		return vocabulary
@@ -83,7 +83,7 @@ func (a *AirTableApi) GetGrammar() []Grammar {
 	var grammar []Grammar
 
 	table := a.Client.GetTable("appLROzl1t7bORKvn", "Grammar")
-	records, err := getSortedUnseenRecords(table, "record_id", 2, "grammar", "meaning", "ex1_ja_furigana", "ex1_en", "ex2_ja_furigana", "ex2_en", "bunpro")
+	records, err := getSortedUnseenRecords(table, "record_id", 3, "grammar", "meaning", "ex1_ja_furigana", "ex1_en", "ex2_ja_furigana", "ex2_en", "bunpro")
 	if err != nil {
 		fmt.Println(err)
 		return grammar
