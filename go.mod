@@ -1,4 +1,4 @@
-module test-go-actions
+module jlpt-practice-helper
 
 go 1.22
 
