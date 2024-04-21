@@ -10,7 +10,7 @@
             font-family: Arial, sans-serif;
             line-height: 1.6;
             color: #333;
-            background-color: #fff5f5;
+            background-color: #f0faff;
         }
 
         h1, h2, h3 {
@@ -50,25 +50,32 @@
             flex: 1 1 20%;
             padding: 10px;
             background-color: #fff;
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            text-align: left;
             border-radius: 5px;
             margin: 0 auto;
         }
 
-        .vocab-table {
-            width: 100%;
-            border-collapse: collapse;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-bottom: 20px;
-            background-color: #fff;
+        .vocab-container {
+            display: block;
         }
 
-        .vocab-table th, .vocab-table td {
-            border: 1px solid #ddd;
+        .vocab-card {
+            display: inline-block;
             padding: 10px;
-            text-align: left;
+            background-color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            margin: 0 auto;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .vocab-card div {
+            margin-bottom: 10px;
+        }
+
+        .vocab-example-jp {
+            font-size: 16px;
         }
 
         table tr:nth-child(even) {
@@ -79,12 +86,8 @@
             background-color: #fff;
         }
 
-        .vocab-table td p, .grammar-table td p {
+        .grammar-table td p {
             font-size: 14px;
-        }
-
-        .vocab-table ruby span, .vocab-table ruby span {
-            font-size: 10px;
         }
 
         .grammar-container {
@@ -125,10 +128,6 @@
             margin-left: 15px;
         }
 
-        .example em {
-            font-style: italic;
-        }
-
         .text-container, .video-container {
             background-color: #fff;
             padding: 20px;
@@ -143,6 +142,10 @@
             position: relative;
         }
 
+        ruby span {
+            font-size: 10px;
+        }
+
         rt {
             display: block;
             position: absolute;
@@ -154,61 +157,73 @@
             white-space: nowrap;
         }
 
+        .hint img {
+            height: 12px;
+        }
+
     </style>
 </head>
 <body>
-<div class="container"><h1>🎌 Daily Japanese Lesson - JLPT N5 Prep 日本語の勉強 🎎</h1>
-    <h2>🈯 Kanji Time! 🈯</h2>
+<div class="container"><h1>🗾 Daily Japanese Lesson - JLPT N4 Prep 🏯</h1>
+    <h2>🈳 Kanji Time! 🈳</h2>
     <div class="kanji-container">
         {{range $index, $kanjiInfo := .Kanji}}
             <div class="kanji-card">
                 <div>
                     <img src="{{$kanjiInfo.GifUrl}}">
                 </div>
-                <p><strong>Meaning:</strong> {{ $kanjiInfo.Meaning }}</p>
-                <p><strong>On Reading:</strong> {{ $kanjiInfo.OnReading }}</p>
-                <p><strong>Kun Reading:</strong> {{ $kanjiInfo.KunReading }}</p>
+                <p><strong>Meaning:</strong> {{$kanjiInfo.Meaning}}</p>
+                <p><strong>On:</strong> {{$kanjiInfo.OnReading}}</p>
+                <p><strong>Kun:</strong> {{$kanjiInfo.KunReading}}</p>
+                <p class="hint"><strong>Hint:</strong> {{$kanjiInfo.KanjiDetail.Hint}}</p>
+                <h4>Example words:</h4>
+                <div>
+                    {{range $exampleIndex, $example := $kanjiInfo.KanjiDetail.Examples}}
+                        {{if le $exampleIndex 4}}
+                            <p>
+                                <strong>{{$example.Japanese}}</strong> - <span>{{$example.Meaning.English}}</span>
+                            </p>
+                        {{end}}
+                    {{end}}
+                </div>
             </div>
         {{end}}
     </div>
 
     <h2>📝 Vocab Fun! 📝</h2>
-    <table class="vocab-table">
-        <thead>
-        <tr>
-            <th>Kanji</th>
-            <th>Kana</th>
-            <th>Meaning</th>
-            <th>Example Sentence (Japanese)</th>
-            <th>Example Sentence (English)</th>
-        </tr>
-        </thead>
-        <tbody>
+    <div class="vocab-container">
         {{range $index, $vocabularyInfo := .Vocabulary}}
-            <tr>
-                <td><a href="https://jisho.org/search/{{$vocabularyInfo.Kanji}}">{{$vocabularyInfo.Kanji}}</a></td>
-                <td>{{$vocabularyInfo.Kana}}</td>
-                <td>{{$vocabularyInfo.Meaning}}</td>
-                <td>{{$vocabularyInfo.ExampleJp}}</td>
-                <td>{{$vocabularyInfo.ExampleEn}}</td>
-            </tr>
+            <div class="vocab-card" style="margin-bottom: 10px">
+                <h3 class="vocab-kanji">
+                    <a href="https://jisho.org/search/{{$vocabularyInfo.Kanji}}">{{$vocabularyInfo.Kanji}}</a> -
+                    <span class="vocab-kana">{{$vocabularyInfo.Kana}}</span>
+                </h3>
+                <div class="vocab-meaning" style="margin-bottom: 5px">{{$vocabularyInfo.Meaning}}</div>
+                <div class="vocab-example-jp" style="font-size: 16px">{{$vocabularyInfo.Example1Jp}}</div>
+                <div class="vocab-example-en" style="margin-bottom: 5px">{{$vocabularyInfo.Example1En}}</div>
+                <div class="vocab-example-jp" style="font-size: 16px">{{$vocabularyInfo.Example2Jp}}</div>
+                <div class="vocab-example-en">{{$vocabularyInfo.Example2En}}</div>
+            </div>
         {{end}}
-        </tbody>
-    </table>
+    </div>
 
     <h2>📚 Grammar Adventure! 📚</h2>
     <div class="grammar-container">
         {{range $index, $grammarInfo := .Grammar}}
             <div class="lesson">
-                <div class="grammar">Grammar Structure: <span><a href="{{$grammarInfo.Bunpro}}">{{$grammarInfo.Grammar}}</a></span></div>
-                <div class="explanation">Explanation: <span>{{$grammarInfo.Explanation}}</span></div>
+                <div class="grammar" style="font-weight: bold; font-size: 20px"><strong>{{$grammarInfo.Grammar}}</strong></div>
+                <div class="explanation">{{$grammarInfo.Explanation}}</div>
+                <br>
                 <div class="example">
-                    <div><strong>Example 1 (Japanese): </strong><em>{{$grammarInfo.Example1Jp}}</em></div>
-                    <div><strong>Example 1 (English): </strong><em>{{$grammarInfo.Example1En}}</em></div>
-                    <div><strong>Example 2 (Japanese): </strong><em>{{$grammarInfo.Example2Jp}}</em></div>
-                    <div><strong>Example 2 (English): </strong><em>{{$grammarInfo.Example2En}}</em></div>
+                    <div style="font-size: 16px">{{$grammarInfo.Example1Jp}}</div>
+                    <div>{{$grammarInfo.Example1En}}</div>
+                    <br>
+                    <div style="font-size: 16px">{{$grammarInfo.Example2Jp}}</div>
+                    <div>{{$grammarInfo.Example2En}}</div>
                 </div>
             </div>
+            <br>
+            <br>
         {{end}}
     </div>
 
@@ -224,7 +239,7 @@
 
     <h2>👂 Listen Carefully ! 👂</h2>
     <div class="video-container">
-        <a href="{{.VideoUrl}}">Click here to listen to a youtube video for N5 listening practice.</a>
+        <a href="{{.VideoUrl}}">Click here to listen to a youtube video for N4 listening practice.</a>
     </div>
 </div>
 </body>

@@ -1,13 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/mehanizm/airtable"
+	"io/ioutil"
 	"log"
+	"math/rand"
+	"net/http"
 	"net/url"
 	"os"
 	"regexp"
 	"strings"
+	"time"
 )
 
 type AirTableApi struct {
@@ -24,29 +29,37 @@ func (a *AirTableApi) InitializeClient() {
 func (a *AirTableApi) GetKanji() []Kanji {
 	var kanji []Kanji
 
-	table := a.Client.GetTable("appLROzl1t7bORKvn", "Kanji")
-	records, err := getSortedUnseenRecords(table, "record_id", 5, "kanji", "meaning", "kun_reading", "on_reading")
+	table := a.Client.GetTable("appuDdot90oIORePj", "Kanji")
+	records, err := getSortedUnseenRecords(table, "record_id", 6, "kanji", "meaning", "kun_reading", "on_reading")
 	if err != nil {
 		fmt.Println(err)
 		return kanji
 	}
 
 	for _, record := range records.Records {
-		character := record.Fields["kanji"].(string)
-		escapedKanji := url.QueryEscape(character)
-		baseURL := "https://raw.githubusercontent.com/jcsirot/kanji.gif/master/kanji/gif/150x150/"
-		gifURL := baseURL + escapedKanji + ".gif"
-
+		character := getStringFieldOrDefaultEmpty(record, "kanji")
 		kunReading := getStringFieldOrDefaultEmpty(record, "kun_reading")
 		onReading := getStringFieldOrDefaultEmpty(record, "on_reading")
+		meaning := getStringFieldOrDefaultEmpty(record, "meaning")
 
-		kanji = append(kanji, Kanji{
-			Kanji:      character,
-			Meaning:    record.Fields["meaning"].(string),
-			KunReading: commaSeparatedList(kunReading),
-			OnReading:  commaSeparatedList(onReading),
-			GifUrl:     gifURL,
-		})
+		kanjiAliveData, err := getKanjiAliveData(character)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		currentKanji := Kanji{
+			Kanji:       character,
+			Meaning:     meaning,
+			KunReading:  commaSeparatedList(kunReading),
+			OnReading:   commaSeparatedList(onReading),
+			GifUrl:      getKanjiStrokesGifUrl(character),
+			KanjiDetail: *kanjiAliveData,
+		}
+		currentKanji.KanjiDetail.Hint = parseHint(currentKanji.KanjiDetail.Hint)
+		currentKanji.KanjiDetail.Examples = shuffle(currentKanji.KanjiDetail.Examples)
+
+		kanji = append(kanji, currentKanji)
 	}
 
 	markRecordsAsSeen(table, records)
@@ -56,22 +69,30 @@ func (a *AirTableApi) GetKanji() []Kanji {
 func (a *AirTableApi) GetVocabulary() []Vocabulary {
 	var vocabulary []Vocabulary
 
-	table := a.Client.GetTable("appLROzl1t7bORKvn", "Vocabulary")
-	records, err := getSortedUnseenRecords(table, "record_id", 40, "kanji", "kana", "english", "ex1_ja_furigana", "ex1_en")
+	table := a.Client.GetTable("appuDdot90oIORePj", "Vocabulary")
+	records, err := getSortedUnseenRecords(table, "record_id", 19, "kanji", "kana", "english", "ex1_ja_furigana", "ex1_en")
 	if err != nil {
 		fmt.Println(err)
 		return vocabulary
 	}
 
 	for _, record := range records.Records {
-		exampleJp := getStringFieldOrDefaultEmpty(record, "ex1_ja_furigana")
-		exampleEn := getStringFieldOrDefaultEmpty(record, "ex1_en")
+		kanji := getStringFieldOrDefaultEmpty(record, "kanji")
+		kana := getStringFieldOrDefaultEmpty(record, "kana")
+		english := getStringFieldOrDefaultEmpty(record, "english")
+		example1Jp := getStringFieldOrDefaultEmpty(record, "ex1_ja_furigana")
+		example1En := getStringFieldOrDefaultEmpty(record, "ex1_en")
+		example2Jp := getStringFieldOrDefaultEmpty(record, "ex2_ja_furigana")
+		example2En := getStringFieldOrDefaultEmpty(record, "ex2_en")
+
 		vocabulary = append(vocabulary, Vocabulary{
-			Kanji:     record.Fields["kanji"].(string),
-			Kana:      record.Fields["kana"].(string),
-			Meaning:   record.Fields["english"].(string),
-			ExampleJp: generateHtmlWithFurigana(exampleJp),
-			ExampleEn: exampleEn,
+			Kanji:      kanji,
+			Kana:       kana,
+			Meaning:    english,
+			Example1Jp: generateHtmlWithFurigana(example1Jp),
+			Example1En: example1En,
+			Example2Jp: generateHtmlWithFurigana(example2Jp),
+			Example2En: example2En,
 		})
 	}
 
@@ -82,8 +103,8 @@ func (a *AirTableApi) GetVocabulary() []Vocabulary {
 func (a *AirTableApi) GetGrammar() []Grammar {
 	var grammar []Grammar
 
-	table := a.Client.GetTable("appLROzl1t7bORKvn", "Grammar")
-	records, err := getSortedUnseenRecords(table, "record_id", 3, "grammar", "meaning", "ex1_ja_furigana", "ex1_en", "ex2_ja_furigana", "ex2_en", "bunpro")
+	table := a.Client.GetTable("appuDdot90oIORePj", "Grammar")
+	records, err := getSortedUnseenRecords(table, "record_id", 2, "grammar", "meaning", "ex1_ja_furigana", "ex1_en", "ex2_ja_furigana", "ex2_en")
 	if err != nil {
 		fmt.Println(err)
 		return grammar
@@ -94,7 +115,6 @@ func (a *AirTableApi) GetGrammar() []Grammar {
 		exampleEn1 := getStringFieldOrDefaultEmpty(record, "ex1_en")
 		exampleJp2 := getStringFieldOrDefaultEmpty(record, "ex2_ja_furigana")
 		exampleEn2 := getStringFieldOrDefaultEmpty(record, "ex2_en")
-		bunpro := getStringFieldOrDefaultEmpty(record, "bunpro")
 
 		grammar = append(grammar, Grammar{
 			Grammar:     record.Fields["grammar"].(string),
@@ -103,7 +123,6 @@ func (a *AirTableApi) GetGrammar() []Grammar {
 			Example1En:  exampleEn1,
 			Example2Jp:  generateHtmlWithFurigana(exampleJp2),
 			Example2En:  exampleEn2,
-			Bunpro:      bunpro,
 		})
 	}
 
@@ -112,10 +131,14 @@ func (a *AirTableApi) GetGrammar() []Grammar {
 }
 
 func (a *AirTableApi) GetListening() string {
-	table := a.Client.GetTable("appLROzl1t7bORKvn", "Listening")
-	records, err := getSortedUnseenRecords(table, "title", 1, "url")
+	table := a.Client.GetTable("appuDdot90oIORePj", "Listening")
+	records, err := getSortedUnseenRecords(table, "url", 1, "url")
 	if err != nil {
 		fmt.Println(err)
+		return ""
+	}
+
+	if len(records.Records) == 0 {
 		return ""
 	}
 
@@ -129,11 +152,15 @@ func (a *AirTableApi) GetListening() string {
 }
 
 func (a *AirTableApi) GetBook() Book {
-	table := a.Client.GetTable("appLROzl1t7bORKvn", "Books")
+	table := a.Client.GetTable("appuDdot90oIORePj", "Books")
 
 	records, err := getSortedUnseenRecords(table, "title", 1, "url", "img")
 	if err != nil {
 		fmt.Println(err)
+		return Book{}
+	}
+
+	if len(records.Records) == 0 {
 		return Book{}
 	}
 
@@ -143,6 +170,32 @@ func (a *AirTableApi) GetBook() Book {
 		Url: records.Records[0].Fields["url"].(string),
 		Img: records.Records[0].Fields["img"].(string),
 	}
+}
+
+func getKanjiAliveData(kanji string) (*KanjiDetail, error) {
+	rapidApiKey := os.Getenv("RAPID_API_KEY")
+
+	url := fmt.Sprintf("https://kanjialive-api.p.rapidapi.com/api/public/kanji/%s", kanji)
+
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("X-RapidAPI-Key", rapidApiKey)
+	req.Header.Add("X-RapidAPI-Host", "kanjialive-api.p.rapidapi.com")
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	body, _ := ioutil.ReadAll(res.Body)
+
+	var KanjiDetail KanjiDetail
+	err = json.Unmarshal(body, &KanjiDetail)
+	if err != nil {
+		return nil, err
+	}
+
+	return &KanjiDetail, nil
 }
 
 func getSortedUnseenRecords(table *airtable.Table, sortField string, maxRecords int, fields ...string) (*airtable.Records, error) {
@@ -210,4 +263,30 @@ func getStringFieldOrDefaultEmpty(record *airtable.Record, fieldName string) str
 	}
 
 	return field
+}
+
+func getKanjiStrokesGifUrl(character string) string {
+	baseURL := "https://raw.githubusercontent.com/jcsirot/kanji.gif/master/kanji/gif/150x150/"
+	escapedKanji := url.QueryEscape(character)
+
+	return baseURL + escapedKanji + ".gif"
+}
+
+func parseHint(hint string) string {
+	re := regexp.MustCompile(`\[(\d+)\]`)
+	return re.ReplaceAllStringFunc(hint, func(match string) string {
+		number := match[1 : len(match)-1]
+		imgTag := fmt.Sprintf(`<img width="14" src="https://media.kanjialive.com/mnemonic_hints/%s.svg"/>`, number)
+		return imgTag
+	})
+}
+
+func shuffle(list []Example) []Example {
+	rand.Seed(time.Now().UnixNano())
+	for i := len(list) - 1; i > 0; i-- {
+		j := rand.Intn(i + 1)
+		list[i], list[j] = list[j], list[i]
+	}
+
+	return list
 }
