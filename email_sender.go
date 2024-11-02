@@ -10,32 +10,17 @@ import (
 	"time"
 )
 
-func sendEmail(kanji []Kanji, vocabulary []Vocabulary, grammar []Grammar, videoUrl string, book Book, templateName string) error {
+func sendEmail(data interface{}, templateName string) error {
 	username := os.Getenv("SMTP_USERNAME")
 	password := os.Getenv("SMTP_PASSWORD")
 	smtpHost := os.Getenv("SMTP_HOST")
 	smtpPort := os.Getenv("SMTP_PORT")
 	to := os.Getenv("EMAIL_TO")
 	from := os.Getenv("EMAIL_FROM")
-	cc := os.Getenv("EMAIL_CC")
 
 	t, err := template.New(templateName).ParseFiles(templateName)
 	if err != nil {
 		return err
-	}
-
-	data := struct {
-		Kanji      []Kanji
-		Vocabulary []Vocabulary
-		Grammar    []Grammar
-		VideoUrl   string
-		Book       Book
-	}{
-		Kanji:      kanji,
-		Vocabulary: vocabulary,
-		Grammar:    grammar,
-		VideoUrl:   videoUrl,
-		Book:       book,
 	}
 
 	// Render the email template with the data
@@ -49,7 +34,6 @@ func sendEmail(kanji []Kanji, vocabulary []Vocabulary, grammar []Grammar, videoU
 	m := mail.NewMessage()
 	m.SetHeader("From", from)
 	m.SetHeader("To", to)
-	m.SetHeader("Cc", cc)
 	m.SetHeader("Subject", "Daily Japanese Lesson for "+getCurrentDate())
 	m.SetBody("text/html", emailBuffer.String())
 

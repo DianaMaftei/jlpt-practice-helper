@@ -13,6 +13,9 @@ env:
   SMTP_PORT: ${{ vars.SMTP_PORT }}
   AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
   RAPID_API_KEY: ${{ secrets.RAPID_API_KEY }}
+  HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
+  GENAI_API_KEY: ${{ secrets.GENAI_API_KEY }}
+  SUNO_API: ${{ secrets.SUNO_API }}
 
 jobs:
 
@@ -26,8 +29,37 @@ jobs:
       with:
         go-version: '1.22'
 
+    - name: Create out directory
+      run: mkdir -p out
+
     - name: Build
       run: go build .
 
     - name: Run
       run: go run .
+
+    - name: Checkout target repository
+      uses: actions/checkout@v2
+      with:
+        repository: DianaMaftei/japanese-study-pages
+        token: ${{ secrets.JAPANESE_STUDY_PAGES_REPO_TOKEN }}
+        path: target-repo
+
+    - name: Copy generated file to target repo
+      run: cp out/* target-repo/public/data/
+
+    - name: List contents of target-repo
+      run: |
+        echo "Listing contents of target-repo:"
+        ls -R target-repo
+
+    - name: Commit and push to target repository
+      working-directory: target-repo
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add public/data/*
+        git commit -m "Add generated file for today"   # Commit with a message
+        git push
+
+

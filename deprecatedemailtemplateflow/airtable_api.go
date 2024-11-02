@@ -1,13 +1,10 @@
-package main
+package deprecatedemailtemplateflow
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/mehanizm/airtable"
-	"io/ioutil"
 	"log"
 	"math/rand"
-	"net/http"
 	"net/url"
 	"os"
 	"regexp"
@@ -170,32 +167,6 @@ func (a *AirTableApi) GetBook() Book {
 		Url: records.Records[0].Fields["url"].(string),
 		Img: records.Records[0].Fields["img"].(string),
 	}
-}
-
-func getKanjiAliveData(kanji string) (*KanjiDetail, error) {
-	rapidApiKey := os.Getenv("RAPID_API_KEY")
-
-	url := fmt.Sprintf("https://kanjialive-api.p.rapidapi.com/api/public/kanji/%s", kanji)
-
-	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Add("X-RapidAPI-Key", rapidApiKey)
-	req.Header.Add("X-RapidAPI-Host", "kanjialive-api.p.rapidapi.com")
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	body, _ := ioutil.ReadAll(res.Body)
-
-	var KanjiDetail KanjiDetail
-	err = json.Unmarshal(body, &KanjiDetail)
-	if err != nil {
-		return nil, err
-	}
-
-	return &KanjiDetail, nil
 }
 
 func getSortedUnseenRecords(table *airtable.Table, sortField string, maxRecords int, fields ...string) (*airtable.Records, error) {
