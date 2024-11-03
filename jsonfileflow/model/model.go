@@ -1,32 +1,32 @@
 package model
 
 type Metadata struct {
-	Seen       bool   // `json:"seen"`
-	UpdateDate string // `json:"update_date"`
+	Seen       bool   `json:"seen"`
+	UpdateDate string `json:"update_date"`
 }
 
 type Grammar struct {
-	Grammar string // `json:"grammar"`
-	Meaning string // `json:"meaning"`
+	Grammar string `json:"grammar"`
+	Meaning string `json:"meaning"`
 	Metadata
 }
 
 type Kanji struct {
-	Kanji      string // `json:"kanji"`
-	OnReading  string // `json:"on_reading"`
-	KunReading string // `json:"kun_reading"`
-	Meaning    string // `json:"meaning"`
-	Examples   string // `json:"examples"`
-	Components string // `json:"components"`
-	Koohii1    string // `json:"koohii1"`
-	Koohii2    string // `json:"koohii2"`
+	Kanji      string `json:"kanji"`
+	OnReading  string `json:"on_reading"`
+	KunReading string `json:"kun_reading"`
+	Meaning    string `json:"meaning"`
+	Examples   string `json:"examples"`
+	Components string `json:"components"`
+	Koohii1    string `json:"koohii1"`
+	Koohii2    string `json:"koohii2"`
 	Metadata
 }
 
 type Vocabulary struct {
-	Kanji   string // `json:"kanji"`
-	Reading string // `json:"reading"`
-	Meaning string // `json:"meaning"`
+	Kanji   string `json:"kanji"`
+	Reading string `json:"reading"`
+	Meaning string `json:"meaning"`
 	Metadata
 }
 
@@ -53,11 +53,16 @@ type SongLyricsResponse struct {
 }
 
 type KanjiImageResponse struct {
-	KanjiList []KanjiImageItem `json:"kanji_list"`
+	KanjiList []KanjiImagePrompt `json:"kanji_list"`
 }
 
-type KanjiImageItem struct {
+type KanjiImagePrompt struct {
 	Kanji            string `json:"kanji"`
+	ImageDescription string `json:"image_description"`
+}
+
+type KanjiInfo struct {
+	Kanji            Kanji  `json:"kanji"`
 	ImageDescription string `json:"image_description"`
 	EncodedImage     string `json:"encoded_image"`
 }
@@ -87,11 +92,29 @@ type GrammarInfo struct {
 	GrammarSentences GrammarSentencesResponse `json:"grammar_sentences"`
 }
 
+type VocabularySentencesResponse struct {
+	VocabularySentences []VocabularySentence `json:"vocabulary_sentences"`
+}
+
+type VocabularySentence struct {
+	Vocabulary string     `json:"vocabulary"`
+	Sentences  []Sentence `json:"sentences"`
+}
+
+type Sentence struct {
+	SentenceJapanese           string `json:"sentence_japanese"`
+	SentenceEnglishTranslation string `json:"sentence_english_translation"`
+}
+
+type VocabularyInfo struct {
+	Vocabulary Vocabulary `json:"vocabulary"`
+	Sentences  []Sentence `json:"sentences"`
+}
+
 type File struct {
-	Kanji             []Kanji            `json:"kanji"`
-	Vocabulary        []Vocabulary       `json:"vocabulary"`
-	GrammarInfo       []GrammarInfo      `json:"grammar_info"`
-	ShortTextWithQuiz ShortTextResponse  `json:"short_text_with_quiz"`
-	Song              Song               `json:"song"`
-	KanjiImages       KanjiImageResponse `json:"kanji_images"`
+	KanjiInfo         []KanjiInfo       `json:"kanji_info"`
+	VocabularyInfo    []VocabularyInfo  `json:"vocabulary_info"`
+	GrammarInfo       []GrammarInfo     `json:"grammar_info"`
+	ShortTextWithQuiz ShortTextResponse `json:"short_text_with_quiz"`
+	Song              Song              `json:"song"`
 }

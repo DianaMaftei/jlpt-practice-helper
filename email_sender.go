@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"gopkg.in/mail.v2"
+	"log"
 	"os"
 	"strconv"
 	"text/template"
@@ -18,7 +19,10 @@ func sendEmail(data interface{}, templateName string) error {
 	to := os.Getenv("EMAIL_TO")
 	from := os.Getenv("EMAIL_FROM")
 
-	t, err := template.New(templateName).ParseFiles(templateName)
+	log.Println("Sending email to", to)
+
+	// Use ParseFiles directly
+	t, err := template.ParseFiles(templateName)
 	if err != nil {
 		return err
 	}
@@ -30,23 +34,22 @@ func sendEmail(data interface{}, templateName string) error {
 		return err
 	}
 
-	// Create the mail message
+	// Rest of the function remains the same
 	m := mail.NewMessage()
 	m.SetHeader("From", from)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", "Daily Japanese Lesson for "+getCurrentDate())
 	m.SetBody("text/html", emailBuffer.String())
 
-	// Set up the SMTP client
 	smtpPortAsNumber, _ := strconv.Atoi(smtpPort)
 	d := mail.NewDialer(smtpHost, smtpPortAsNumber, username, password)
 
-	// Send the email
 	err = d.DialAndSend(m)
 	if err != nil {
 		return err
 	}
 
+	log.Println("Email sent successfully")
 	return nil
 }
 

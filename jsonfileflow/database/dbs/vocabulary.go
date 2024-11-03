@@ -48,7 +48,7 @@ func LoadVocabularyFromFile() ([]model.Vocabulary, error) {
 	return vocabularies, nil
 }
 
-func SaveToFileToFile(vocabularies []model.Vocabulary) error {
+func SaveVocabularyToFile(vocabularies []model.Vocabulary) error {
 	file, err := os.Create(vocabularyFilePath)
 	if err != nil {
 		return err

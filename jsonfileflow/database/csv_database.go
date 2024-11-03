@@ -111,3 +111,63 @@ func GetVocabulary(count int, kanjiArray []model.Kanji) []model.Vocabulary {
 
 	return selectedVocabulary // Return the selected vocabulary items
 }
+
+func SaveGrammar(updatedGrammar []model.Grammar) error {
+	// Update the existing grammar in memory
+	for _, updatedItem := range updatedGrammar {
+		for i, item := range grammar {
+			if item.Grammar == updatedItem.Grammar {
+				grammar[i] = updatedItem
+				break
+			}
+		}
+	}
+
+	// Write the updated grammar to file
+	if err := dbs.SaveGrammarToFile(grammar); err != nil {
+		log.Printf("Error saving grammar data: %v", err)
+		return err
+	}
+	log.Println("Grammar data saved successfully.")
+	return nil
+}
+
+func SaveKanji(updatedKanji []model.Kanji) error {
+	// Update the existing kanji in memory
+	for _, updatedItem := range updatedKanji {
+		for i, item := range kanji {
+			if item.Kanji == updatedItem.Kanji {
+				kanji[i] = updatedItem
+				break
+			}
+		}
+	}
+
+	// Write the updated kanji to file
+	if err := dbs.SaveKanjiToFile(kanji); err != nil {
+		log.Printf("Error saving kanji data: %v", err)
+		return err
+	}
+	log.Println("Kanji data saved successfully.")
+	return nil
+}
+
+func SaveVocabulary(updatedVocabulary []model.Vocabulary) error {
+	// Update the existing vocabulary in memory
+	for _, updatedItem := range updatedVocabulary {
+		for i, item := range vocabulary {
+			if item.Kanji == updatedItem.Kanji {
+				vocabulary[i] = updatedItem
+				break
+			}
+		}
+	}
+
+	// Write the updated vocabulary to file
+	if err := dbs.SaveVocabularyToFile(vocabulary); err != nil {
+		log.Printf("Error saving vocabulary data: %v", err)
+		return err
+	}
+	log.Println("Vocabulary data saved successfully.")
+	return nil
+}

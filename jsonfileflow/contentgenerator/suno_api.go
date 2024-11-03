@@ -3,6 +3,8 @@ package contentgenerator
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"io"
 	"jlpt-practice-helper/jsonfileflow/model"
 	"log"
 	"math/rand"
@@ -161,20 +163,18 @@ var artists = map[string]string{
 	"Phoebe Bridgers":          "Bedroom, grungegaze, catchy, psychedelic, acoustic tape recording, female vocals",
 }
 
-func GenerateSongFromLyrics(prompt string, title string) ([]*model.SongResponse, string, error) {
+func GenerateSongFromLyrics(prompt string, title string) ([]model.SongResponse, string, error) {
 	log.Printf("Generating song from lyrics with title: %s\n", title)
 
-	rand.Seed(time.Now().UnixNano())
-	artist := getRandomArtist()
-	log.Printf("Selected artist: %s\n", artist)
-	artistStyle := artists[artist]
+	artistStyle := getRandomStyle()
+	log.Printf("Selected style: %s\n", artistStyle)
 
 	requestBody := map[string]interface{}{
 		"is_custom":         true,
 		"make_instrumental": false,
 		"model_version":     "chirp-v3-5",
 		"prompt":            prompt,
-		"tags":              artist,
+		"tags":              artistStyle,
 		"title":             title,
 		"wait_audio":        true,
 	}
@@ -192,25 +192,26 @@ func GenerateSongFromLyrics(prompt string, title string) ([]*model.SongResponse,
 		log.Println("Error making POST request:", err)
 		return nil, "", err
 	}
+	body, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 
-	var response []model.SongResponse
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		log.Println("Error decoding response:", err)
-		return nil, "", err
+	var songResponses []model.SongResponse
+
+	// Check if status code is 200
+	if resp.StatusCode != http.StatusOK {
+		return nil, "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	if len(response) >= 2 {
-		log.Println("Successfully generated song responses.")
-		return []*model.SongResponse{&response[0], &response[1]}, artistStyle, nil
+	// Unmarshal directly into the simplified struct array
+	if err := json.Unmarshal(body, &songResponses); err != nil {
+		return nil, "", fmt.Errorf("error unmarshaling response: %v", err)
 	}
 
-	log.Println("No song responses generated.")
-
-	return nil, "", nil
+	return songResponses, artistStyle, nil
 }
 
-func getRandomArtist() string {
+func getRandomStyle() string {
+	rand.Seed(time.Now().UnixNano())
 	keys := make([]string, 0, len(artists))
 	for k := range artists {
 		keys = append(keys, k)
