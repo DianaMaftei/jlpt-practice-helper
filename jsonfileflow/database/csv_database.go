@@ -94,10 +94,16 @@ func GetVocabulary(count int, kanjiArray []model.Kanji) []model.Vocabulary {
 		for _, k := range kanjiArray {
 			if strings.Contains(vocab.Kanji, k.Kanji) {
 				selectedVocabulary = append(selectedVocabulary, vocab)
+				if len(selectedVocabulary) == count {
+					return selectedVocabulary // Return immediately if count is reached
+				}
 				break // Break to avoid adding the same vocab multiple times
-			} else if len(spareVocabulary) != count {
+			} else if len(spareVocabulary) < count {
 				spareVocabulary = append(spareVocabulary, vocab) // Add to spare if not matched
 			}
+		}
+		if len(selectedVocabulary) == count {
+			return selectedVocabulary // Return immediately if count is reached
 		}
 	}
 

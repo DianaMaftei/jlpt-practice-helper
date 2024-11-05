@@ -12,9 +12,9 @@ import (
 	"os"
 )
 
-func GetShortTextWithQuiz(kanji []string, vocabulary []string, grammar []string) (*model.ShortTextResponse, error) {
+func GetShortTextWithQuiz(vocabulary []string, grammar []string) (*model.ShortTextResponse, error) {
 	log.Println("Generating short text with quiz...")
-	prompt := contentgenerator.GetShortTextPrompt(kanji, vocabulary, grammar)
+	prompt := contentgenerator.GetShortTextPrompt(vocabulary, grammar)
 	schema := GetResponseSchemaForShortTextResponse()
 
 	return generateAndParseResponse[model.ShortTextResponse](prompt, schema)

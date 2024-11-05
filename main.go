@@ -37,15 +37,14 @@ func jsonFileFlow() error {
 
 	// fetch data from DB
 	kanji := database.GetKanji(5)
-	vocabulary := database.GetVocabulary(15, kanji)
-	grammar := database.GetGrammar(3)
+	vocabulary := database.GetVocabulary(21, kanji)
+	grammar := database.GetGrammar(2)
 
-	kanjiArray := extractKanjiArray(kanji)
 	vocabularyArray := extractVocabularyArray(vocabulary)
 	grammarArray := extractGrammarArray(grammar)
 
 	// generate content
-	shortText, err := gemini.GetShortTextWithQuiz(kanjiArray, vocabularyArray, grammarArray)
+	shortText, err := gemini.GetShortTextWithQuiz(vocabularyArray, grammarArray)
 	if err != nil {
 		logError(err)
 	}
