@@ -90,6 +90,9 @@ func GetVocabulary(count int, kanjiArray []model.Kanji) []model.Vocabulary {
 		if len(selectedVocabulary) >= count {
 			break
 		}
+		if vocab.Seen {
+			continue // Skip this item if it has been seen
+		}
 
 		// Search for vocabulary items containing any of the Kanji from the array
 		added := false
