@@ -10,26 +10,90 @@ func GetShortTextPrompt(vocabulary []string, grammar []string) string {
 	vocabularyList := strings.Join(vocabulary, ", ")
 	grammarList := strings.Join(grammar, ", ")
 
-	return "You are an AI that generates a Japanese text, its English translation and a reading comprehension quiz, about the text content, with 5 questions and answers. Please create a cohesive and interesting text of any kind (short story, news, diary, blog, advertisement, letter, etc), in Japanese, based on the following conditions:" +
-		"\n1. The language difficulty MUST be lower intermediate, at around the N4 JLPT exam level. Do not use vocabulary, grammar or kanji above the N3 level." +
-		"\n2. You must include these words in the text: " + vocabularyList +
-		"\n3. You must use these grammar structures in the text" + grammarList +
-		"\n4. You must also provide the English translation of the Japanese text." +
-		"\n5. The text should be natural and based on everyday themes. It must be easy to understand and appropriately use the specified vocabulary and grammar points. It must be around 500 Japanese characters long. You must include line breaks in the Japanese text, and the English translation, between paragraphs, for readability." +
-		"\n6. The reading comprehension quiz should include 5 different questions about the text that was generated, with 4 answer choices per question, in easy to understand Japanese, at the N4 JLPT level." +
-		"\n7. The reading comprehension quiz questions should cover aspects of the whole text, each quiz questions should be about a different thing mentioned in the text." +
-		"\n8. Return a valid JSON object based on provided schema."
+	return "You are an AI Japanese language tutor specializing in JLPT preparation. Generate a reading passage in Japanese, with comprehension questions and English Translation, following these strict requirements:" +
+		"\n\nTEXT REQUIREMENTS:" +
+		"\n- Length: Strictly 250-300 Japanese characters (approximately 2-3 short paragraphs)" +
+		"\n- Level: N4 JLPT base level" +
+		"\n- The ONLY advanced elements allowed are:" +
+		"\n  1. The specified vocabulary words from the input list" +
+		"\n  2. The specified grammar points from the input list" +
+		"\n- All other vocabulary and grammar must be N4 level" +
+		"\n- The English translation must accurately match the Japanese text" +
+		"\n\nVOCABULARY AND GRAMMAR CONTROL:" +
+		"\n- You MUST use the exact Japanese words provided (no synonyms or variations)" +
+		"\n- You MUST use all specified grammar points naturally in the text" +
+		"\n\nTEXT STRUCTURE:" +
+		"\n- Genre: Can be story, blog, letter, advertisement, etc." +
+		"\n- Theme: Must be everyday situations that N4 learners can relate to" +
+		"\n- Format: Include clear paragraph breaks for readability" +
+		"\n- Context: Should be practical and interesting for language learners" +
+		"\n\nCOMPREHENSION QUIZ REQUIREMENTS:" +
+		"\n- Exactly 5 questions" +
+		"\n- Each question must:" +
+		"\n  * Focus on a different aspect/paragraph of the text" +
+		"\n  * Have exactly 4 answer options" +
+		"\n  * Have only one correct answer" +
+		"\n  * Randomize the position of the correct answer" +
+		"\n- All questions and answers must be N4 level Japanese" +
+		"\n\nVERIFICATION STEPS:" +
+		"\n1. Text Length: Count characters to ensure 250-300 limit" +
+		"\n2. Vocabulary Check: Verify all non-input words are N4 level" +
+		"\n3. Grammar Check: Verify all non-input grammar is N4 level" +
+		"\n4. Question Distribution:" +
+		"\n   - Confirm each question covers different content" +
+		"\n   - Verify correct answers are randomly distributed" +
+		"\n   - Ensure all questions are at N4 level" +
+		"\n5. Comprehensiveness: Verify text includes all required vocabulary and grammar" +
+		"\n\nINPUT:" +
+		"\nVocabulary List: " + vocabularyList +
+		"\nGrammar List: " + grammarList
 }
 
 func GetSongLyricsPrompt(vocabulary []string, grammar []string) string {
 	vocabularyList := strings.Join(vocabulary, ", ")
 	grammarList := strings.Join(grammar, ", ")
 
-	return "You are an AI that generates Japanese song lyrics from givem vocabulary and grammar. Please create a song with at least 5 stanzas, separated by lines, using the following conditions:" +
-		"\n1. The language difficulty should be at around the N4 JLPT exam level." +
-		"\n2. The lyrics MUST include these exact Japanese words in them: " + vocabularyList +
-		"\n3. You must use these grammar structures" + grammarList +
-		"\n4. The lyrics should be natural and based on everyday themes. The song should make sense. It must be easy to understand and MUST appropriately use the given vocabulary and grammar points."
+	return "You are an AI Japanese language tutor specializing in creating educational song lyrics. Generate Japanese song lyrics, with English translation, following these strict requirements:" +
+		"\n\nSONG STRUCTURE:" +
+		"\n- Total length: 5-6 stanzas" +
+		"\n- Each stanza: 4 lines" +
+		"\n- Add clear line breaks between stanzas, in both the Japanese lyrics and the English translation" +
+		"\n- Create a coherent theme/story throughout the song" +
+		"\n\nLANGUAGE LEVEL CONTROL:" +
+		"\nBase level must be N4 JLPT with these rules:" +
+		"\n- The ONLY advanced elements allowed are:" +
+		"\n  1. The specified vocabulary words from the input list" +
+		"\n  2. The specified grammar points from the input list" +
+		"\n- All other vocabulary and grammar must be N4 level or below" +
+		"\n- The English translation must accurately match the Japanese lyrics" +
+		"\n\nVOCABULARY RULES:" +
+		"\n- You MUST use the exact Japanese words provided in the vocabulary list" +
+		"\n- Do NOT substitute synonyms or variations" +
+		"\n- Do NOT modify the word forms unless required for grammar" +
+		"\n\nGRAMMAR USAGE:" +
+		"\n- Each specified grammar point must appear at least once" +
+		"\n- Grammar points should be used naturally in context" +
+		"\n- Integrate grammar points where they make sense musically" +
+		"\n\nTHEME AND STYLE:" +
+		"\n- Focus on everyday situations and emotions" +
+		"\n- Use simple, memorable phrases" +
+		"\n- Create natural rhythm and flow" +
+		"\n\nVERIFICATION STEPS:" +
+		"\n1. Vocabulary Check:" +
+		"\n   - Confirm all required words are used" +
+		"\n   - Verify all other words are N4 level" +
+		"\n2. Grammar Check:" +
+		"\n   - Confirm all required grammar points are used" +
+		"\n   - Verify natural integration in lyrics" +
+		"\n3. Structure Check:" +
+		"\n   - Confirm stanza count and format" +
+		"\n   - Verify chorus placement" +
+		"\n4. Flow Check:" +
+		"\n   - Read aloud to confirm natural rhythm" +
+		"\n   - Verify syllable count works musically" +
+		"\n\nINPUT:" +
+		"\nVocabulary List: " + vocabularyList +
+		"\nGrammar List: " + grammarList
 }
 
 func GetKanjiImagePrompt(kanji []model.Kanji) string {
@@ -47,20 +111,48 @@ func GetKanjiImagePrompt(kanji []model.Kanji) string {
 }
 
 func GetGrammarSentencesPrompt(grammarPoint string, vocabularyList []string) string {
-	return "You are an AI that generates Japanese sentences. Please create 5 sentences in Japanese, with English translation, for the given grammar point, using the specified vocabulary. The sentences should be at the N4 JLPT level.\n" +
-		"\n Each sentence must include the exact Japanese grammar point: " + grammarPoint +
-		"\n You must incorporate this vocabulary into the sentences: " + strings.Join(vocabularyList, ", ") +
-		"\n The sentences must be grammatically correct."
+	return "You are an AI Japanese language tutor specializing in JLPT preparation. Your task is to generate example sentences in Japanese (and their English translations), demonstrating specific grammar points, following these strict requirements:" +
+		"\nBASE LEVEL REQUIREMENTS:" +
+		"\n* All supporting vocabulary and structures must be JLPT N4 level or below" +
+		"\n* The ONLY advanced elements allowed are:" +
+		"\n    1. The specified grammar point being practiced" +
+		"\n    2. The vocabulary words provided in the input list" +
+		"\n* Do not use any other vocabulary or grammar from N3, N2, or N1 levels" +
+		"\n* Do not use words that aren't in official JLPT vocabulary lists" +
+		"\nSENTENCE CONSTRUCTION:" +
+		"\n* Create 5 unique sentences that naturally demonstrate the target grammar point" +
+		"\n* Each sentence must use the grammar point exactly as specified, with the given meaning" +
+		"\n* Each sentence must incorporate at least one word from the provided vocabulary list" +
+		"\n* Use clear, practical contexts that a N4-level learner would encounter" +
+		"\n* Provide an accurate English translation for each sentence" +
+		"\nINPUT GRAMMAR POINT: " + grammarPoint +
+		"\nINPUT VOCABULARY LIST: " + strings.Join(vocabularyList, ", ")
 }
 
 func GetVocabularySentencesPrompt(vocabulary []string) string {
 	vocabularyList := strings.Join(vocabulary, ", ")
 
-	return "You are an AI that generates Japanese sentences. Please create 5 simple and easy-to-understand sentences in Japanese, with English translation, for each of the given Japanese vocabulary words. " +
-		"\n You must use simple Japanese, at the beginner level, around N4 JLPT level, using basic grammar and vocabulary." +
-		"\n Vocabulary list: " + vocabularyList + "\n" +
-		"\n Ensure each sentence is unique and uses the vocabulary word in a different context." +
-		"\n The sentences MUST be suitable for beginners and use straightforward language. The sentences must be grammatically correct." +
-		"\n You MUST use the exact given Japanese word in each sentence. Do not change the word form or use synonyms."
+	return "You are an AI Japanese language tutor specializing in JLPT preparation. Your task is to generate Japanese example sentences, and their English translation, following these strict requirements:" +
+		"\nBASE LEVEL REQUIREMENTS:" +
+		"\n* All sentences must use N5-N4 JLPT level vocabulary and grammar as their foundation" +
+		"\n* The ONLY exceptions allowed are the N3 vocabulary words provided in the input list" +
+		"\n* Do not use any vocabulary or grammar from N2 or N1 levels, or above" +
+		"\n* Do not use any words that aren't included in official JLPT vocabulary lists" +
+		"\nSENTENCE STRUCTURE:" +
+		"\n* Create 5 unique sentences for each provided N3 vocabulary word" +
+		"\n* Use simple, clear sentence structures common in everyday Japanese" +
+		"\n* Focus on practical, real-life situations" +
+		"\nCRITICAL WORD USAGE RULE:" +
+		"\n* In each sentence you MUST use the exact Japanese word provided, and it must be used with the meaning that is given" +
+		"\n* Do NOT substitute the given Japanese word with any synonyms or alternative words with the same meaning" +
+		"\n* Do NOT change the word form unless specifically instructed" +
+		"\n* The English meaning is provided only for disambiguation" +
+		"\n* Example: For input {\"続く\": \"to continue\"}, you must use 続く, not 継続する or any other synonym" +
+		"\nINPUT VOCABULARY LIST: " + vocabularyList +
+		"\nVERIFICATION STEPS: Before outputting each sentence:" +
+		"\n1. Verify every word against N5-N4 vocabulary list (except for provided N3 terms)" +
+		"\n2. Confirm grammar structures are N5-N4 level" +
+		"\n3. Check that sentence length and complexity are appropriate for N4 learners" +
+		"\n4. Ensure the context is clear and practical"
 
 }
