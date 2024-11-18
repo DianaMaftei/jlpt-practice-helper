@@ -123,14 +123,6 @@ func jsonFileFlow() error {
 	return nil
 }
 
-func extractKanjiArray(kanji []model.Kanji) []string {
-	kanjiArray := make([]string, len(kanji))
-	for i, k := range kanji {
-		kanjiArray[i] = k.Kanji
-	}
-	return kanjiArray
-}
-
 func extractVocabularyArray(vocabulary []model.Vocabulary) []string {
 	vocabularyArray := make([]string, len(vocabulary))
 	for i, v := range vocabulary {

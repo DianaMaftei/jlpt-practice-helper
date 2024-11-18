@@ -53,47 +53,11 @@ func GetSongLyricsPrompt(vocabulary []string, grammar []string) string {
 	vocabularyList := strings.Join(vocabulary, ", ")
 	grammarList := strings.Join(grammar, ", ")
 
-	return "You are an AI Japanese language tutor specializing in creating educational song lyrics. Generate Japanese song lyrics, with English translation, following these strict requirements:" +
-		"\n\nSONG STRUCTURE:" +
-		"\n- Total length: 5-6 stanzas" +
-		"\n- Each stanza: 4 lines" +
-		"\n- Add clear line breaks between stanzas, in both the Japanese lyrics and the English translation" +
-		"\n- Create a coherent theme/story throughout the song" +
-		"\n\nLANGUAGE LEVEL CONTROL:" +
-		"\nBase level must be N4 JLPT with these rules:" +
-		"\n- The ONLY advanced elements allowed are:" +
-		"\n  1. The specified vocabulary words from the input list" +
-		"\n  2. The specified grammar points from the input list" +
-		"\n- All other vocabulary and grammar must be N4 level or below" +
-		"\n- The English translation must accurately match the Japanese lyrics" +
-		"\n\nVOCABULARY RULES:" +
-		"\n- You MUST use the exact Japanese words provided in the vocabulary list" +
-		"\n- Do NOT substitute synonyms or variations" +
-		"\n- Do NOT modify the word forms unless required for grammar" +
-		"\n\nGRAMMAR USAGE:" +
-		"\n- Each specified grammar point must appear at least once" +
-		"\n- Grammar points should be used naturally in context" +
-		"\n- Integrate grammar points where they make sense musically" +
-		"\n\nTHEME AND STYLE:" +
-		"\n- Focus on everyday situations and emotions" +
-		"\n- Use simple, memorable phrases" +
-		"\n- Create natural rhythm and flow" +
-		"\n\nVERIFICATION STEPS:" +
-		"\n1. Vocabulary Check:" +
-		"\n   - Confirm all required words are used" +
-		"\n   - Verify all other words are N4 level" +
-		"\n2. Grammar Check:" +
-		"\n   - Confirm all required grammar points are used" +
-		"\n   - Verify natural integration in lyrics" +
-		"\n3. Structure Check:" +
-		"\n   - Confirm stanza count and format" +
-		"\n   - Verify chorus placement" +
-		"\n4. Flow Check:" +
-		"\n   - Read aloud to confirm natural rhythm" +
-		"\n   - Verify syllable count works musically" +
-		"\n\nINPUT:" +
-		"\nVocabulary List: " + vocabularyList +
-		"\nGrammar List: " + grammarList
+	return "You are an AI that generates Japanese song lyrics from given vocabulary and grammar. Please create a song with at least 5 stanzas, separated by lines, using the following conditions:" +
+		"\n1. The language difficulty should be at around the N4 JLPT exam level." +
+		"\n2. The lyrics MUST include these exact Japanese words in them: " + vocabularyList +
+		"\n3. You must use these grammar structures" + grammarList +
+		"\n4. The lyrics should be natural and based on everyday themes. The song should make sense. It must be easy to understand and MUST appropriately use the given vocabulary and grammar points."
 }
 
 func GetKanjiImagePrompt(kanji []model.Kanji) string {

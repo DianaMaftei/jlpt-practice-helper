@@ -10,14 +10,35 @@ import (
 	"jlpt-practice-helper/jsonfileflow/model"
 	"log"
 	"os"
+	"time"
 )
 
 func GetShortTextWithQuiz(vocabulary []string, grammar []string) (*model.ShortTextResponse, error) {
 	log.Println("Generating short text with quiz...")
-	prompt := contentgenerator.GetShortTextPrompt(vocabulary, grammar)
-	schema := GetResponseSchemaForShortTextResponse()
 
-	return generateAndParseResponse[model.ShortTextResponse](prompt, schema)
+	var response *model.ShortTextResponse
+	var err error
+	maxRetries := 3
+
+	for retries := 0; retries < maxRetries; retries++ {
+		prompt := contentgenerator.GetShortTextPrompt(vocabulary, grammar)
+		schema := GetResponseSchemaForShortTextResponse()
+
+		response, err = generateAndParseResponse[model.ShortTextResponse](prompt, schema)
+		if err != nil {
+			return nil, err
+		}
+
+		emptyContent := response == nil || response.TextJapanese == "" || response.TextEnglish == ""
+		if !emptyContent {
+			break
+		}
+
+		log.Println("Empty or lacking content detected, retrying in 60 seconds...")
+		time.Sleep(60 * time.Second)
+	}
+
+	return response, nil
 }
 
 func GenerateSongLyrics(vocabulary []string, grammar []string) (*model.SongLyricsResponse, error) {
@@ -38,18 +59,72 @@ func GenerateKanjiMnemonicImages(kanji []model.Kanji) (*model.KanjiImageResponse
 
 func GenerateExampleSentencesForGrammar(grammar string, vocabulary []string) (*model.GrammarSentencesResponse, error) {
 	log.Println("Generating example sentences for grammar point " + grammar)
-	prompt := contentgenerator.GetGrammarSentencesPrompt(grammar, vocabulary)
-	schema := GetResponseSchemaForGrammarSentencesResponse()
 
-	return generateAndParseResponse[model.GrammarSentencesResponse](prompt, schema)
+	var response *model.GrammarSentencesResponse
+	var err error
+	maxRetries := 3
+
+	for retries := 0; retries < maxRetries; retries++ {
+		prompt := contentgenerator.GetGrammarSentencesPrompt(grammar, vocabulary)
+		schema := GetResponseSchemaForGrammarSentencesResponse()
+
+		response, err = generateAndParseResponse[model.GrammarSentencesResponse](prompt, schema)
+		if err != nil {
+			return nil, err
+		}
+
+		emptyContent := response.Sentences == nil || len(response.Sentences) == 0
+		for _, sentence := range response.Sentences {
+			if sentence.SentenceJapanese == "" || sentence.SentenceEnglishTranslation == "" {
+				emptyContent = true
+				break
+			}
+		}
+
+		if !emptyContent {
+			break
+		}
+
+		log.Println("Empty or lacking content detected, retrying in 60 seconds...")
+		time.Sleep(60 * time.Second)
+	}
+
+	return response, nil
 }
 
 func GenerateSentencesForVocabulary(vocabulary []string) (*model.VocabularySentencesResponse, error) {
 	log.Println("Generating sentences for vocabulary...")
-	prompt := contentgenerator.GetVocabularySentencesPrompt(vocabulary)
-	schema := GetResponseSchemaForVocabularySentencesResponse()
 
-	return generateAndParseResponse[model.VocabularySentencesResponse](prompt, schema)
+	var response *model.VocabularySentencesResponse
+	var err error
+	maxRetries := 3
+
+	for retries := 0; retries < maxRetries; retries++ {
+		prompt := contentgenerator.GetVocabularySentencesPrompt(vocabulary)
+		schema := GetResponseSchemaForVocabularySentencesResponse()
+
+		response, err = generateAndParseResponse[model.VocabularySentencesResponse](prompt, schema)
+		if err != nil {
+			return nil, err
+		}
+
+		emptyContent := false
+		for _, vocabSentence := range response.VocabularySentences {
+			if vocabSentence.Sentences == nil || len(vocabSentence.Sentences) == 0 {
+				emptyContent = true
+				break
+			}
+		}
+
+		if !emptyContent {
+			break
+		}
+
+		log.Println("Empty or lacking content detected, retrying in 60 seconds...")
+		time.Sleep(60 * time.Second)
+	}
+
+	return response, nil
 }
 
 func generateAndParseResponse[T any](prompt string, schema *genai.Schema) (*T, error) {
