@@ -1,15 +1,9 @@
 package contentgenerator
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"io"
 	"jlpt-practice-helper/jsonfileflow/model"
 	"log"
 	"math/rand"
-	"net/http"
-	"os"
 	"time"
 )
 
@@ -169,45 +163,49 @@ func GenerateSongFromLyrics(prompt string, title string) ([]model.SongResponse, 
 	artistStyle := getRandomStyle()
 	log.Printf("Selected style: %s\n", artistStyle)
 
-	requestBody := map[string]interface{}{
-		"is_custom":         true,
-		"make_instrumental": false,
-		"model_version":     "chirp-v3-5",
-		"prompt":            prompt,
-		"tags":              artistStyle,
-		"title":             title,
-		"wait_audio":        true,
-	}
+	return nil, artistStyle, nil
 
-	jsonData, err := json.Marshal(requestBody)
-	if err != nil {
-		log.Println("Error marshaling request body:", err)
-		return nil, "", err
-	}
+	// api currently decommissioned since it requires captcha
 
-	sunoAPI := os.Getenv("SUNO_API") // Ensure you set this environment variable
-
-	resp, err := http.Post(sunoAPI, "application/json", bytes.NewBuffer(jsonData))
-	if err != nil {
-		log.Println("Error making POST request:", err)
-		return nil, "", err
-	}
-	body, err := io.ReadAll(resp.Body)
-	defer resp.Body.Close()
-
-	var songResponses []model.SongResponse
-
-	// Check if status code is 200
-	if resp.StatusCode != http.StatusOK {
-		return nil, "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
-
-	// Unmarshal directly into the simplified struct array
-	if err := json.Unmarshal(body, &songResponses); err != nil {
-		return nil, "", fmt.Errorf("error unmarshaling response: %v", err)
-	}
-
-	return songResponses, artistStyle, nil
+	//requestBody := map[string]interface{}{
+	//	"is_custom":         true,
+	//	"make_instrumental": false,
+	//	"model_version":     "chirp-v3-5",
+	//	"prompt":            prompt,
+	//	"tags":              artistStyle,
+	//	"title":             title,
+	//	"wait_audio":        true,
+	//}
+	//
+	//jsonData, err := json.Marshal(requestBody)
+	//if err != nil {
+	//	log.Println("Error marshaling request body:", err)
+	//	return nil, "", err
+	//}
+	//
+	//sunoAPI := os.Getenv("SUNO_API") // Ensure you set this environment variable
+	//
+	//resp, err := http.Post(sunoAPI, "application/json", bytes.NewBuffer(jsonData))
+	//if err != nil {
+	//	log.Println("Error making POST request:", err)
+	//	return nil, "", err
+	//}
+	//body, err := io.ReadAll(resp.Body)
+	//defer resp.Body.Close()
+	//
+	//var songResponses []model.SongResponse
+	//
+	//// Check if status code is 200
+	//if resp.StatusCode != http.StatusOK {
+	//	return nil, "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	//}
+	//
+	//// Unmarshal directly into the simplified struct array
+	//if err := json.Unmarshal(body, &songResponses); err != nil {
+	//	return nil, "", fmt.Errorf("error unmarshaling response: %v", err)
+	//}
+	//
+	//return songResponses, artistStyle, nil
 }
 
 func getRandomStyle() string {

@@ -54,14 +54,12 @@ func jsonFileFlow() error {
 		logError(err)
 	}
 
-	songsFromLyrics, style, err := contentgenerator.GenerateSongFromLyrics(lyrics.LyricsJapanese, lyrics.SongTitle)
+	_, style, err := contentgenerator.GenerateSongFromLyrics(lyrics.LyricsJapanese, lyrics.SongTitle)
 	if err != nil {
 		logError(err)
 	}
 
-	songIds := extractSongIds(songsFromLyrics)
 	song := model.Song{
-		Ids:        songIds,
 		Style:      style,
 		SongLyrics: *lyrics,
 	}

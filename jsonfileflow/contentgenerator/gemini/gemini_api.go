@@ -109,6 +109,9 @@ func GenerateSentencesForVocabulary(vocabulary []string) (*model.VocabularySente
 		}
 
 		emptyContent := false
+		if len(response.VocabularySentences) != len(vocabulary) {
+			emptyContent = true
+		}
 		for _, vocabSentence := range response.VocabularySentences {
 			if vocabSentence.Sentences == nil || len(vocabSentence.Sentences) == 0 {
 				emptyContent = true
