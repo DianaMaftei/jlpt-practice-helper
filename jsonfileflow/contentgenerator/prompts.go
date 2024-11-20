@@ -10,14 +10,14 @@ func GetShortTextPrompt(vocabulary []string, grammar []string) string {
 	vocabularyList := strings.Join(vocabulary, ", ")
 	grammarList := strings.Join(grammar, ", ")
 
-	return "You are an AI Japanese language tutor specializing in JLPT preparation. Generate a reading passage in Japanese, with comprehension questions and English Translation, following these strict requirements:" +
+	return "You are an AI Japanese language tutor specializing in JLPT preparation. Generate a reading text in Japanese, with comprehension questions and English Translation, following these strict requirements:" +
 		"\n\nTEXT REQUIREMENTS:" +
-		"\n- Length: Strictly 250-300 Japanese characters (approximately 2-3 short paragraphs)" +
-		"\n- Level: N4 JLPT base level" +
+		"\n- Length: Strictly 450-500 Japanese characters" +
+		"\n- Level: N4 JLPT base level (beginner level)" +
 		"\n- The ONLY advanced elements allowed are:" +
 		"\n  1. The specified vocabulary words from the input list" +
 		"\n  2. The specified grammar points from the input list" +
-		"\n- All other vocabulary and grammar must be N4 level" +
+		"\n- All other vocabulary and grammar must be only up to N4 level" +
 		"\n- The English translation must accurately match the Japanese text" +
 		"\n\nVOCABULARY AND GRAMMAR CONTROL:" +
 		"\n- You MUST use the exact Japanese words provided (no synonyms or variations)" +
@@ -34,15 +34,15 @@ func GetShortTextPrompt(vocabulary []string, grammar []string) string {
 		"\n  * Have exactly 4 answer options" +
 		"\n  * Have only one correct answer" +
 		"\n  * Randomize the position of the correct answer" +
-		"\n- All questions and answers must be N4 level Japanese" +
+		"\n- All questions and answers must be use easy Japanese, at the beginner level" +
 		"\n\nVERIFICATION STEPS:" +
-		"\n1. Text Length: Count characters to ensure 250-300 limit" +
+		"\n1. Text Length: Count characters to ensure 450-500 limit" +
 		"\n2. Vocabulary Check: Verify all non-input words are N4 level" +
 		"\n3. Grammar Check: Verify all non-input grammar is N4 level" +
 		"\n4. Question Distribution:" +
 		"\n   - Confirm each question covers different content" +
 		"\n   - Verify correct answers are randomly distributed" +
-		"\n   - Ensure all questions are at N4 level" +
+		"\n   - Ensure all questions are at N4 (easy) level" +
 		"\n5. Comprehensiveness: Verify text includes all required vocabulary and grammar" +
 		"\n\nINPUT:" +
 		"\nVocabulary List: " + vocabularyList +
