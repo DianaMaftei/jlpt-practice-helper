@@ -2,7 +2,6 @@ name: JLPT-Practice-Helper
 
 on:
   schedule:
-    - cron: '10 1 * * 1-6'
   workflow_dispatch:
 
 env:
